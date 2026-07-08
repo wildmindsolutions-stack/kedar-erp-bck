@@ -8,10 +8,10 @@ export declare class SalesController {
         customer: {
             id: string;
             name: string;
+            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
             email: string | null;
-            isActive: boolean;
             isDeleted: boolean;
             gstin: string | null;
             phone: string | null;
@@ -42,9 +42,9 @@ export declare class SalesController {
             product: {
                 id: string;
                 name: string;
+                isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                isActive: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -76,9 +76,9 @@ export declare class SalesController {
             product: {
                 id: string;
                 name: string;
+                isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                isActive: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -106,10 +106,10 @@ export declare class SalesController {
             customer: {
                 id: string;
                 name: string;
+                isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
                 email: string | null;
-                isActive: boolean;
                 isDeleted: boolean;
                 gstin: string | null;
                 phone: string | null;
@@ -159,10 +159,10 @@ export declare class SalesController {
         customer: {
             id: string;
             name: string;
+            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
             email: string | null;
-            isActive: boolean;
             isDeleted: boolean;
             gstin: string | null;
             phone: string | null;
@@ -175,9 +175,9 @@ export declare class SalesController {
             product: {
                 id: string;
                 name: string;
+                isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                isActive: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -209,9 +209,9 @@ export declare class SalesController {
             product: {
                 id: string;
                 name: string;
+                isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                isActive: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -239,10 +239,10 @@ export declare class SalesController {
             customer: {
                 id: string;
                 name: string;
+                isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
                 email: string | null;
-                isActive: boolean;
                 isDeleted: boolean;
                 gstin: string | null;
                 phone: string | null;

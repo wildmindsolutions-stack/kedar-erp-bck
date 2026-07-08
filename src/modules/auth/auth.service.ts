@@ -16,7 +16,7 @@ export class AuthService {
       where: { email: dto.email },
       include: { role: true },
     });
-    if (!user || !user.isActive) {
+    if (!user || !user.isActive || !user.role.isActive) {
       throw new UnauthorizedException('Invalid credentials');
     }
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
@@ -24,8 +24,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
     const payload = { sub: user.id, email: user.email };
+    const isPrivileged = ['Owner', 'Admin'].includes(user.role.name);
+    const accessToken = isPrivileged
+      ? this.jwt.sign(payload, { expiresIn: '7d' })
+      : this.jwt.sign(payload, { expiresIn: '30m' });
+
     return {
-      accessToken: this.jwt.sign(payload),
+      accessToken,
       user: {
         id: user.id,
         name: user.name,
@@ -42,6 +47,7 @@ export class AuthService {
       include: { role: true },
     });
     if (!user) throw new UnauthorizedException();
+    if (!user.role.isActive) throw new UnauthorizedException();
     return {
       id: user.id,
       name: user.name,

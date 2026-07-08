@@ -8,10 +8,10 @@ export declare class CustomersController {
         outstanding: number;
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         email: string | null;
-        isActive: boolean;
         isDeleted: boolean;
         gstin: string | null;
         phone: string | null;
@@ -33,10 +33,10 @@ export declare class CustomersController {
         }[];
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         email: string | null;
-        isActive: boolean;
         isDeleted: boolean;
         gstin: string | null;
         phone: string | null;
@@ -56,10 +56,10 @@ export declare class CustomersController {
     }, user: JwtPayload): Promise<{
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         email: string | null;
-        isActive: boolean;
         isDeleted: boolean;
         gstin: string | null;
         phone: string | null;
@@ -71,10 +71,10 @@ export declare class CustomersController {
     update(id: string, body: Record<string, unknown>): import(".prisma/client").Prisma.Prisma__CustomerClient<{
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         email: string | null;
-        isActive: boolean;
         isDeleted: boolean;
         gstin: string | null;
         phone: string | null;
@@ -86,10 +86,10 @@ export declare class CustomersController {
     remove(id: string): import(".prisma/client").Prisma.Prisma__CustomerClient<{
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         email: string | null;
-        isActive: boolean;
         isDeleted: boolean;
         gstin: string | null;
         phone: string | null;

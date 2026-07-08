@@ -77,5 +77,4 @@ export declare class DashboardService {
     private getSalesTrend;
     private getRecentActivity;
     private formatAuditTitle;
-    private getOutstandingTotal;
 }

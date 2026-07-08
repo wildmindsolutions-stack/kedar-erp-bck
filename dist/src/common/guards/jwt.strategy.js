@@ -29,7 +29,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
             where: { id: payload.sub },
             include: { role: true },
         });
-        if (!user || !user.isActive) {
+        if (!user || !user.isActive || !user.role.isActive) {
             throw new common_1.UnauthorizedException();
         }
         return {

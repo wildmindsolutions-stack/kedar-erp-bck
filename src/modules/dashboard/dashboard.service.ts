@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { getCustomerOutstanding, getProductStock } from '../../common/utils/gst.util';
+import { getAllProductStock, getTotalOutstandingReceivable } from '../../common/utils/gst.util';
 import {
   getBusinessDateString,
   getBusinessDayUtcRange,
@@ -36,36 +36,44 @@ export class DashboardService {
 
     const [
       todayProduction,
-      todayInvoices,
-      monthlyInvoices,
+      todayInvoiceAgg,
+      monthlyInvoiceAgg,
       products,
       topProducts,
       recentActivity,
-      lowStock,
+      stockByProduct,
       pendingDeliveries,
       dispatchedDeliveries,
       invoicesAwaitingChallan,
       draftOrders,
+      pendingPayments,
     ] = await Promise.all([
       this.prisma.productionBatch.aggregate({
         where: { batchDate: parseBusinessDate(todayBiz) },
         _sum: { qtyProduced: true },
       }),
-      this.prisma.invoice.findMany({
+      this.prisma.invoice.aggregate({
         where: { issuedAt: { gte: dayStart, lt: dayEnd }, isDeleted: false },
+        _sum: { total: true },
+        _count: true,
       }),
-      this.prisma.invoice.findMany({
+      this.prisma.invoice.aggregate({
         where: { issuedAt: { gte: monthStart }, isDeleted: false },
+        _sum: { total: true },
       }),
-      this.prisma.product.findMany({ where: { isDeleted: false, isActive: true } }),
-      this.prisma.invoiceItem.groupBy({
-        by: ['productId'],
-        _sum: { qty: true },
-        orderBy: { _sum: { qty: 'desc' } },
-        take: 5,
-      }),
+      canAccessModule(role, permissions, 'products')
+        ? this.prisma.product.count({ where: { isDeleted: false, isActive: true } })
+        : Promise.resolve(0),
+      canSales
+        ? this.prisma.invoiceItem.groupBy({
+            by: ['productId'],
+            _sum: { qty: true },
+            orderBy: { _sum: { qty: 'desc' } },
+            take: 5,
+          })
+        : Promise.resolve([]),
       this.getRecentActivity(role, permissions),
-      this.getLowStockItems(),
+      canInventory ? getAllProductStock(this.prisma) : Promise.resolve(new Map<string, number>()),
       canDelivery
         ? this.prisma.delivery.count({ where: { status: 'PENDING' } })
         : Promise.resolve(0),
@@ -74,23 +82,29 @@ export class DashboardService {
         : Promise.resolve(0),
       canDelivery ? this.getInvoicesAwaitingChallan() : Promise.resolve([]),
       canSales ? this.getDraftOrders() : Promise.resolve([]),
+      canPayments ? getTotalOutstandingReceivable(this.prisma) : Promise.resolve(0),
     ]);
 
-    const todaySales = todayInvoices.reduce((s, i) => s + Number(i.total), 0);
-    const monthlyRevenue = monthlyInvoices.reduce((s, i) => s + Number(i.total), 0);
-    const pendingPayments = canPayments ? await this.getOutstandingTotal() : 0;
+    const todaySales = Number(todayInvoiceAgg._sum.total || 0);
+    const monthlyRevenue = Number(monthlyInvoiceAgg._sum.total || 0);
+    const lowStock = canInventory
+      ? await this.getLowStockItems(stockByProduct as Map<string, number>)
+      : [];
     const lowStockCount = lowStock.length;
 
-    const topProductDetails = await Promise.all(
-      topProducts.map(async (tp) => {
-        const product = await this.prisma.product.findUnique({ where: { id: tp.productId } });
-        return {
-          productId: tp.productId,
-          productName: product?.name || 'Unknown',
-          totalQty: Number(tp._sum.qty || 0),
-        };
-      }),
-    );
+    const productIds = topProducts.map((tp) => tp.productId);
+    const productNames = productIds.length
+      ? await this.prisma.product.findMany({
+          where: { id: { in: productIds } },
+          select: { id: true, name: true },
+        })
+      : [];
+    const nameById = Object.fromEntries(productNames.map((p) => [p.id, p.name]));
+    const topProductDetails = topProducts.map((tp) => ({
+      productId: tp.productId,
+      productName: nameById[tp.productId] || 'Unknown',
+      totalQty: Number(tp._sum.qty || 0),
+    }));
 
     const salesTrend = canSales ? await this.getSalesTrend() : [];
     const roleTasks = this.buildRoleTasks({
@@ -108,10 +122,10 @@ export class DashboardService {
       role,
       todayProduction: canManufacturing ? Number(todayProduction._sum.qtyProduced || 0) : null,
       todaySales: canSales ? todaySales : null,
-      todayInvoiceCount: canSales ? todayInvoices.length : null,
+      todayInvoiceCount: canSales ? todayInvoiceAgg._count : null,
       monthlyRevenue: canSales ? monthlyRevenue : null,
       pendingPayments: canPayments ? pendingPayments : null,
-      totalProducts: canAccessModule(role, permissions, 'products') ? products.length : null,
+      totalProducts: canAccessModule(role, permissions, 'products') ? products : null,
       lowStockCount: canInventory ? lowStockCount : null,
       pendingDeliveries: canDelivery ? pendingDeliveries : null,
       dispatchedDeliveries: canDelivery ? dispatchedDeliveries : null,
@@ -255,14 +269,14 @@ export class DashboardService {
     });
   }
 
-  private async getLowStockItems() {
+  private async getLowStockItems(stockByProduct: Map<string, number>) {
     const products = await this.prisma.product.findMany({
       where: { isDeleted: false, isActive: true },
       include: { unit: true },
     });
     const items = [];
     for (const p of products) {
-      const stock = await getProductStock(this.prisma, p.id);
+      const stock = stockByProduct.get(p.id) ?? 0;
       if (stock <= Number(p.lowStockThreshold)) {
         items.push({ productName: p.name, stock, unit: p.unit.symbol, threshold: Number(p.lowStockThreshold) });
       }
@@ -272,28 +286,43 @@ export class DashboardService {
 
   private async getSalesTrend() {
     const days = 7;
-    const result = [];
     const todayBiz = getBusinessDateString();
     const anchor = parseBusinessDate(todayBiz);
+    const firstDay = new Date(anchor);
+    firstDay.setUTCDate(firstDay.getUTCDate() - (days - 1));
+    const { start } = getBusinessDayUtcRange(getBusinessDateString(firstDay));
+    const { end: endExclusive } = getBusinessDayUtcRange(todayBiz);
 
+    const invoices = await this.prisma.invoice.findMany({
+      where: { issuedAt: { gte: start, lt: endExclusive }, isDeleted: false },
+      select: { issuedAt: true, total: true },
+    });
+
+    const dayKeys: string[] = [];
+    const salesByDay = new Map<string, number>();
     for (let i = days - 1; i >= 0; i--) {
       const day = new Date(anchor);
       day.setUTCDate(day.getUTCDate() - i);
       const dayStr = getBusinessDateString(day);
-      const { start, end } = getBusinessDayUtcRange(dayStr);
-      const invoices = await this.prisma.invoice.findMany({
-        where: { issuedAt: { gte: start, lt: end }, isDeleted: false },
-      });
-      result.push({
-        date: day.toLocaleDateString('en-IN', {
-          day: '2-digit',
-          month: 'short',
-          timeZone: 'Asia/Kolkata',
-        }),
-        sales: invoices.reduce((s, inv) => s + Number(inv.total), 0),
-      });
+      dayKeys.push(dayStr);
+      salesByDay.set(dayStr, 0);
     }
-    return result;
+
+    for (const inv of invoices) {
+      const dayStr = getBusinessDateString(new Date(inv.issuedAt));
+      if (salesByDay.has(dayStr)) {
+        salesByDay.set(dayStr, (salesByDay.get(dayStr) || 0) + Number(inv.total));
+      }
+    }
+
+    return dayKeys.map((dayStr) => ({
+      date: parseBusinessDate(dayStr).toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        timeZone: 'Asia/Kolkata',
+      }),
+      sales: salesByDay.get(dayStr) || 0,
+    }));
   }
 
   private async getRecentActivity(role: string, permissions: string[]) {
@@ -304,7 +333,7 @@ export class DashboardService {
         include: { user: { select: { name: true, role: { select: { name: true } } } } },
       }),
       this.prisma.notification.findMany({
-        take: 40,
+        take: 20,
         orderBy: { createdAt: 'desc' },
         include: { actor: { select: { name: true, role: { select: { name: true } } } } },
       }),
@@ -378,16 +407,5 @@ export class DashboardService {
       product: { create: 'Product added', update: 'Product updated' },
     };
     return labels[entity]?.[action] ?? `${entity.replace(/_/g, ' ')} ${action}`;
-  }
-
-  private async getOutstandingTotal() {
-    const customers = await this.prisma.customer.findMany({
-      where: { isDeleted: false, isActive: true },
-    });
-    let total = 0;
-    for (const c of customers) {
-      total += await getCustomerOutstanding(this.prisma, c.id);
-    }
-    return total;
   }
 }

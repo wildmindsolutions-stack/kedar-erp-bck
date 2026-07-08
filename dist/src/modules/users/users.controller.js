@@ -18,6 +18,7 @@ const passport_1 = require("@nestjs/passport");
 const users_service_1 = require("./users.service");
 const roles_guard_1 = require("../../common/guards/roles.guard");
 const roles_decorator_1 = require("../../common/decorators/roles.decorator");
+const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -31,8 +32,17 @@ let UsersController = class UsersController {
     create(body) {
         return this.usersService.create(body);
     }
-    update(id, body) {
-        return this.usersService.update(id, body);
+    updateRole(roleId, body) {
+        return this.usersService.updateRole(roleId, body);
+    }
+    removeRole(roleId) {
+        return this.usersService.removeRole(roleId);
+    }
+    update(id, body, user) {
+        return this.usersService.update(user.sub, id, body);
+    }
+    deactivate(id, user) {
+        return this.usersService.deactivate(user.sub, id);
     }
     resetPassword(id, body) {
         return this.usersService.resetPassword(id, body.password);
@@ -41,38 +51,57 @@ let UsersController = class UsersController {
 exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Get)(),
-    (0, roles_decorator_1.Roles)('Owner', 'Admin'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('roles'),
-    (0, roles_decorator_1.Roles)('Owner', 'Admin'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "findRoles", null);
 __decorate([
     (0, common_1.Post)(),
-    (0, roles_decorator_1.Roles)('Owner', 'Admin'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "create", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
-    (0, roles_decorator_1.Roles)('Owner', 'Admin'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Patch)('roles/:roleId'),
+    __param(0, (0, common_1.Param)('roleId')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
+], UsersController.prototype, "updateRole", null);
+__decorate([
+    (0, common_1.Delete)('roles/:roleId'),
+    __param(0, (0, common_1.Param)('roleId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "removeRole", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", void 0)
 ], UsersController.prototype, "update", null);
 __decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "deactivate", null);
+__decorate([
     (0, common_1.Post)(':id/reset-password'),
-    (0, roles_decorator_1.Roles)('Owner', 'Admin'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -82,6 +111,7 @@ __decorate([
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('Owner', 'Admin'),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UsersController);
 //# sourceMappingURL=users.controller.js.map

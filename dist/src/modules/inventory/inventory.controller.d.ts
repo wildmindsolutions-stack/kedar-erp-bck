@@ -16,9 +16,9 @@ export declare class InventoryController {
         product: {
             id: string;
             name: string;
+            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            isActive: boolean;
             categoryId: string;
             unitId: string;
             price: import("@prisma/client/runtime/library").Decimal;

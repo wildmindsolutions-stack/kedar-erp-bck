@@ -26,6 +26,16 @@ let PaymentsService = class PaymentsService {
         });
     }
     async create(data) {
+        if (data.amount <= 0) {
+            throw new common_1.BadRequestException('Payment amount must be greater than zero');
+        }
+        const outstanding = await (0, gst_util_1.getCustomerOutstanding)(this.prisma, data.customerId);
+        if (outstanding <= 0) {
+            throw new common_1.BadRequestException('This customer has no outstanding balance to collect');
+        }
+        if (data.amount > outstanding) {
+            throw new common_1.BadRequestException(`Payment amount cannot exceed outstanding balance of ₹${outstanding.toFixed(2)}`);
+        }
         const payment = await this.prisma.$transaction(async (tx) => {
             const created = await tx.payment.create({
                 data: {

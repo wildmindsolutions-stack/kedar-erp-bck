@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       where: { id: payload.sub },
       include: { role: true },
     });
-    if (!user || !user.isActive) {
+    if (!user || !user.isActive || !user.role.isActive) {
       throw new UnauthorizedException();
     }
     return {

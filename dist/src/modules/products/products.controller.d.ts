@@ -21,9 +21,9 @@ export declare class ProductsController {
         };
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        isActive: boolean;
         categoryId: string;
         unitId: string;
         hsnCode: string;
@@ -64,9 +64,9 @@ export declare class ProductsController {
     } & {
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        isActive: boolean;
         categoryId: string;
         unitId: string;
         price: import("@prisma/client/runtime/library").Decimal;
@@ -91,9 +91,9 @@ export declare class ProductsController {
     } & {
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        isActive: boolean;
         categoryId: string;
         unitId: string;
         price: import("@prisma/client/runtime/library").Decimal;
@@ -106,9 +106,9 @@ export declare class ProductsController {
     remove(id: string): Promise<{
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        isActive: boolean;
         categoryId: string;
         unitId: string;
         price: import("@prisma/client/runtime/library").Decimal;

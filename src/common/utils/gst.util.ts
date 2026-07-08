@@ -50,15 +50,55 @@ export function calculateGstLine(
   };
 }
 
+export async function getAllProductStock(
+  prisma: { stockLedger: { groupBy: (args: object) => Promise<{ productId: string; _sum: { qtyChange: unknown } }[]> } },
+): Promise<Map<string, number>> {
+  const rows = await prisma.stockLedger.groupBy({
+    by: ['productId'],
+    _sum: { qtyChange: true },
+  });
+  const map = new Map<string, number>();
+  for (const row of rows) {
+    map.set(row.productId, Number(row._sum.qtyChange ?? 0));
+  }
+  return map;
+}
+
 export async function getCustomerOutstanding(
   prisma: { customerLedger: { findMany: (args: object) => Promise<{ type: string; amount: { toNumber: () => number } }[]> } },
   customerId: string,
 ): Promise<number> {
   const entries = await prisma.customerLedger.findMany({ where: { customerId } });
-  return entries.reduce((sum, e) => {
+  const raw = entries.reduce((sum, e) => {
     const amt = Number(e.amount);
     return e.type === 'DEBIT' ? sum + amt : sum - amt;
   }, 0);
+  return Math.round(raw * 100) / 100;
+}
+
+/** Sum of amounts customers owe (ignores credit/overpayment balances). */
+export async function getTotalOutstandingReceivable(
+  prisma: {
+    $queryRaw: <T>(query: TemplateStringsArray, ...values: unknown[]) => Promise<T>;
+  },
+): Promise<number> {
+  const rows = await prisma.$queryRaw<{ total: number | string }[]>`
+    SELECT COALESCE(SUM(sub.balance), 0) AS total
+    FROM (
+      SELECT SUM(
+        CASE WHEN cl.type = 'DEBIT' THEN cl.amount ELSE -cl.amount END
+      ) AS balance
+      FROM customer_ledger cl
+      INNER JOIN customers c ON c.id = cl.customer_id
+      WHERE c.is_deleted = false AND c.is_active = true
+      GROUP BY cl.customer_id
+      HAVING SUM(
+        CASE WHEN cl.type = 'DEBIT' THEN cl.amount ELSE -cl.amount END
+      ) > 0
+    ) sub
+  `;
+
+  return Math.round(Number(rows[0]?.total ?? 0) * 100) / 100;
 }
 
 export async function getProductStock(

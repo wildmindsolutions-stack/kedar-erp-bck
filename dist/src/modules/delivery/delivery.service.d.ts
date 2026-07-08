@@ -9,10 +9,10 @@ export declare class DeliveryService {
             customer: {
                 id: string;
                 name: string;
+                isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
                 email: string | null;
-                isActive: boolean;
                 isDeleted: boolean;
                 gstin: string | null;
                 phone: string | null;
@@ -55,10 +55,10 @@ export declare class DeliveryService {
                 customer: {
                     id: string;
                     name: string;
+                    isActive: boolean;
                     createdAt: Date;
                     updatedAt: Date;
                     email: string | null;
-                    isActive: boolean;
                     isDeleted: boolean;
                     gstin: string | null;
                     phone: string | null;
@@ -119,10 +119,10 @@ export declare class DeliveryService {
                 customer: {
                     id: string;
                     name: string;
+                    isActive: boolean;
                     createdAt: Date;
                     updatedAt: Date;
                     email: string | null;
-                    isActive: boolean;
                     isDeleted: boolean;
                     gstin: string | null;
                     phone: string | null;
@@ -181,10 +181,10 @@ export declare class DeliveryService {
                 customer: {
                     id: string;
                     name: string;
+                    isActive: boolean;
                     createdAt: Date;
                     updatedAt: Date;
                     email: string | null;
-                    isActive: boolean;
                     isDeleted: boolean;
                     gstin: string | null;
                     phone: string | null;
@@ -239,10 +239,10 @@ export declare class DeliveryService {
                 customer: {
                     id: string;
                     name: string;
+                    isActive: boolean;
                     createdAt: Date;
                     updatedAt: Date;
                     email: string | null;
-                    isActive: boolean;
                     isDeleted: boolean;
                     gstin: string | null;
                     phone: string | null;

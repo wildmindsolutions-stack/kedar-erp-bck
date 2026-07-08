@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { getCustomerOutstanding } from '../../common/utils/gst.util';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -26,6 +26,20 @@ export class PaymentsService {
     notes?: string;
     createdBy?: string;
   }) {
+    if (data.amount <= 0) {
+      throw new BadRequestException('Payment amount must be greater than zero');
+    }
+
+    const outstanding = await getCustomerOutstanding(this.prisma, data.customerId);
+    if (outstanding <= 0) {
+      throw new BadRequestException('This customer has no outstanding balance to collect');
+    }
+    if (data.amount > outstanding) {
+      throw new BadRequestException(
+        `Payment amount cannot exceed outstanding balance of ₹${outstanding.toFixed(2)}`,
+      );
+    }
+
     const payment = await this.prisma.$transaction(async (tx) => {
       const created = await tx.payment.create({
         data: {

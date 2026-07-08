@@ -7,26 +7,32 @@ export declare class UsersService {
             id: string;
             name: string;
             permissions: import("@prisma/client/runtime/library").JsonValue;
+            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
         };
     } & {
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         email: string;
         passwordHash: string;
         roleId: string;
-        isActive: boolean;
     })[]>;
-    findRoles(): import(".prisma/client").Prisma.PrismaPromise<{
+    findRoles(): import(".prisma/client").Prisma.PrismaPromise<({
+        _count: {
+            users: number;
+        };
+    } & {
         id: string;
         name: string;
         permissions: import("@prisma/client/runtime/library").JsonValue;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-    }[]>;
+    })[]>;
     create(data: {
         name: string;
         email: string;
@@ -37,20 +43,21 @@ export declare class UsersService {
             id: string;
             name: string;
             permissions: import("@prisma/client/runtime/library").JsonValue;
+            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
         };
     } & {
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         email: string;
         passwordHash: string;
         roleId: string;
-        isActive: boolean;
     }>;
-    update(id: string, data: {
+    update(actorId: string, id: string, data: {
         name?: string;
         email?: string;
         roleId?: string;
@@ -60,27 +67,75 @@ export declare class UsersService {
             id: string;
             name: string;
             permissions: import("@prisma/client/runtime/library").JsonValue;
+            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
         };
     } & {
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         email: string;
         passwordHash: string;
         roleId: string;
-        isActive: boolean;
     }>;
-    resetPassword(id: string, password: string): Promise<{
+    deactivate(actorId: string, id: string): Promise<{
+        role: {
+            id: string;
+            name: string;
+            permissions: import("@prisma/client/runtime/library").JsonValue;
+            isActive: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+        };
+    } & {
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         email: string;
         passwordHash: string;
         roleId: string;
-        isActive: boolean;
     }>;
+    resetPassword(id: string, password: string): Promise<{
+        role: {
+            id: string;
+            name: string;
+            permissions: import("@prisma/client/runtime/library").JsonValue;
+            isActive: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+        };
+    } & {
+        id: string;
+        name: string;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        email: string;
+        passwordHash: string;
+        roleId: string;
+    }>;
+    updateRole(roleId: string, data: {
+        isActive?: boolean;
+    }): Promise<{
+        _count: {
+            users: number;
+        };
+    } & {
+        id: string;
+        name: string;
+        permissions: import("@prisma/client/runtime/library").JsonValue;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    removeRole(roleId: string): Promise<{
+        success: boolean;
+        name: string;
+    }>;
+    private ensureAnotherActiveOwner;
 }
