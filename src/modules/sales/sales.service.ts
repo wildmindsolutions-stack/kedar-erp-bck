@@ -11,6 +11,7 @@ import {
 import PDFKit = require('pdfkit');
 import { Response } from 'express';
 import { NotificationsService } from '../notifications/notifications.service';
+import { CustomerNotificationsService } from '../customer-notifications/customer-notifications.service';
 
 @Injectable()
 export class SalesService {
@@ -18,6 +19,7 @@ export class SalesService {
     private prisma: PrismaService,
     private config: ConfigService,
     private notifications: NotificationsService,
+    private customerNotifications: CustomerNotificationsService,
   ) {}
 
   findAll() {
@@ -48,6 +50,7 @@ export class SalesService {
     notes?: string;
     items: { productId: string; qty: number; rate: number }[];
     createdBy?: string;
+    sourceMessage?: string;
   }) {
     if (!data.items?.length) {
       throw new BadRequestException('Order must have at least one item');
@@ -81,7 +84,8 @@ export class SalesService {
       module: 'sales',
       type: 'ORDER_CREATED',
       title: 'New Sales Order',
-      message: `${actor?.name || 'Sales'} created a draft order for ${order.customer.name}`,
+      message: data.sourceMessage
+        || `${actor?.name || 'Sales'} created a draft order for ${order.customer.name}`,
       refId: order.id,
       link: '/sales',
       actorId: data.createdBy,
@@ -99,7 +103,7 @@ export class SalesService {
         where: { id: orderId },
         include: {
           customer: true,
-          items: { include: { product: true } },
+          items: { include: { product: { include: { unit: true } } } },
           invoice: true,
         },
       });
@@ -114,9 +118,30 @@ export class SalesService {
 
       for (const item of order.items) {
         const stock = await getProductStock(tx as unknown as PrismaService, item.productId);
-        if (stock < Number(item.qty)) {
+        const needed = Number(item.qty);
+        if (stock < needed) {
+          const shortfall = needed - stock;
+          const unit = item.product.unit?.symbol ?? 'units';
+          await this.notifications.notifyByModule({
+            module: 'manufacturing',
+            type: 'PRODUCTION_REQUIRED',
+            title: 'Cannot Confirm — Production Needed',
+            message: `Order for ${order.customer.name}: ${item.product.name} needs ${shortfall} more ${unit} (have ${stock}, need ${needed}). Produce before confirming.`,
+            refId: orderId,
+            link: '/manufacturing',
+            actorId: userId,
+          });
+          await this.notifications.notifyByModule({
+            module: 'inventory',
+            type: 'CONFIRM_BLOCKED',
+            title: 'Order Confirmation Blocked',
+            message: `Insufficient stock for ${item.product.name} (${stock} available, ${needed} required). Order cannot be confirmed until stock is available.`,
+            refId: orderId,
+            link: '/inventory',
+            actorId: userId,
+          });
           throw new BadRequestException(
-            `Insufficient stock for ${item.product.name}. Available: ${stock}`,
+            `Insufficient stock for ${item.product.name}. Available: ${stock}, required: ${needed}. Produce ${shortfall} more before confirming.`,
           );
         }
       }
@@ -290,6 +315,13 @@ export class SalesService {
       actorId: userId,
     });
 
+    await this.customerNotifications.notifyCustomer(invoice.order.customerId, {
+      type: 'ORDER_CONFIRMED',
+      title: 'Order Confirmed',
+      message: `Your order has been confirmed. Invoice ${invoice.invoiceNo} for ₹${Number(invoice.total).toLocaleString('en-IN')} has been generated.`,
+      refId: invoice.orderId,
+    });
+
     return invoice;
   }
 
@@ -299,10 +331,21 @@ export class SalesService {
     if (order.status === 'CONFIRMED') {
       throw new BadRequestException('Cannot cancel confirmed order');
     }
-    return this.prisma.salesOrder.update({
+    const updated = await this.prisma.salesOrder.update({
       where: { id: orderId },
       data: { status: 'CANCELLED' },
     });
+
+    if (order.notes?.includes('Kedar Foundation')) {
+      await this.customerNotifications.notifyCustomer(order.customerId, {
+        type: 'ORDER_CANCELLED',
+        title: 'Order Cancelled',
+        message: 'Your order was cancelled. Please contact us if you need assistance.',
+        refId: orderId,
+      });
+    }
+
+    return updated;
   }
 
   async generateInvoicePdf(invoiceId: string, res: Response) {

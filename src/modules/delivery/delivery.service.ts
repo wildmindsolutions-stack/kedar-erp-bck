@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { CustomerNotificationsService } from '../customer-notifications/customer-notifications.service';
 
 @Injectable()
 export class DeliveryService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
+    private customerNotifications: CustomerNotificationsService,
   ) {}
 
   async getAvailableInvoices() {
@@ -94,6 +96,14 @@ export class DeliveryService {
       actorId: data.actorId,
     });
 
+    const vehicleInfo = delivery.vehicle ? ` Vehicle: ${delivery.vehicle}.` : '';
+    await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
+      type: 'ORDER_DISPATCHED',
+      title: 'Order Dispatched',
+      message: `Your order is on the way! Challan ${delivery.challanNo}.${vehicleInfo}`,
+      refId: delivery.invoice.orderId,
+    });
+
     return delivery;
   }
 
@@ -112,6 +122,13 @@ export class DeliveryService {
       refId: delivery.id,
       link: '/delivery',
       actorId,
+    });
+
+    await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
+      type: 'ORDER_DELIVERED',
+      title: 'Order Delivered',
+      message: `Your order has been delivered successfully. Thank you for choosing Kedar Foundation!`,
+      refId: delivery.invoice.orderId,
     });
 
     return delivery;

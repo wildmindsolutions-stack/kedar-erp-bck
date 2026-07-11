@@ -94,4 +94,50 @@ export class ProductsService {
       data: { isDeleted: true, isActive: false },
     });
   }
+
+  /** Public storefront catalogue (Kedar Foundation website). */
+  async findStoreCatalog() {
+    const products = await this.prisma.product.findMany({
+      where: { isDeleted: false, isActive: true },
+      include: { category: true, unit: true },
+      orderBy: { name: 'asc' },
+    });
+    return Promise.all(products.map((p) => this.toStoreProduct(p)));
+  }
+
+  async findStoreProduct(id: string) {
+    const product = await this.prisma.product.findFirst({
+      where: { id, isDeleted: false, isActive: true },
+      include: { category: true, unit: true },
+    });
+    if (!product) return null;
+    return this.toStoreProduct(product);
+  }
+
+  private async toStoreProduct(p: {
+    id: string;
+    name: string;
+    price: unknown;
+    hsnCode: string;
+    gstRate: unknown;
+    imageUrl: string | null;
+    category: { name: string };
+    unit: { name: string; symbol: string };
+  }) {
+    const stock = await getProductStock(this.prisma, p.id);
+    return {
+      id: p.id,
+      slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      name: p.name,
+      category: p.category.name,
+      unit: p.unit.symbol,
+      unitName: p.unit.name,
+      price: Number(p.price),
+      hsnCode: p.hsnCode,
+      gstRate: Number(p.gstRate),
+      imageUrl: p.imageUrl,
+      inStock: stock > 0,
+      stock,
+    };
+  }
 }
