@@ -16,11 +16,13 @@ const prisma_service_1 = require("../../prisma/prisma.service");
 const gst_util_1 = require("../../common/utils/gst.util");
 const PDFKit = require("pdfkit");
 const notifications_service_1 = require("../notifications/notifications.service");
+const customer_notifications_service_1 = require("../customer-notifications/customer-notifications.service");
 let SalesService = class SalesService {
-    constructor(prisma, config, notifications) {
+    constructor(prisma, config, notifications, customerNotifications) {
         this.prisma = prisma;
         this.config = config;
         this.notifications = notifications;
+        this.customerNotifications = customerNotifications;
     }
     findAll() {
         return this.prisma.salesOrder.findMany({
@@ -73,7 +75,8 @@ let SalesService = class SalesService {
             module: 'sales',
             type: 'ORDER_CREATED',
             title: 'New Sales Order',
-            message: `${actor?.name || 'Sales'} created a draft order for ${order.customer.name}`,
+            message: data.sourceMessage
+                || `${actor?.name || 'Sales'} created a draft order for ${order.customer.name}`,
             refId: order.id,
             link: '/sales',
             actorId: data.createdBy,
@@ -88,7 +91,7 @@ let SalesService = class SalesService {
                 where: { id: orderId },
                 include: {
                     customer: true,
-                    items: { include: { product: true } },
+                    items: { include: { product: { include: { unit: true } } } },
                     invoice: true,
                 },
             });
@@ -102,8 +105,29 @@ let SalesService = class SalesService {
             }
             for (const item of order.items) {
                 const stock = await (0, gst_util_1.getProductStock)(tx, item.productId);
-                if (stock < Number(item.qty)) {
-                    throw new common_1.BadRequestException(`Insufficient stock for ${item.product.name}. Available: ${stock}`);
+                const needed = Number(item.qty);
+                if (stock < needed) {
+                    const shortfall = needed - stock;
+                    const unit = item.product.unit?.symbol ?? 'units';
+                    await this.notifications.notifyByModule({
+                        module: 'manufacturing',
+                        type: 'PRODUCTION_REQUIRED',
+                        title: 'Cannot Confirm — Production Needed',
+                        message: `Order for ${order.customer.name}: ${item.product.name} needs ${shortfall} more ${unit} (have ${stock}, need ${needed}). Produce before confirming.`,
+                        refId: orderId,
+                        link: '/manufacturing',
+                        actorId: userId,
+                    });
+                    await this.notifications.notifyByModule({
+                        module: 'inventory',
+                        type: 'CONFIRM_BLOCKED',
+                        title: 'Order Confirmation Blocked',
+                        message: `Insufficient stock for ${item.product.name} (${stock} available, ${needed} required). Order cannot be confirmed until stock is available.`,
+                        refId: orderId,
+                        link: '/inventory',
+                        actorId: userId,
+                    });
+                    throw new common_1.BadRequestException(`Insufficient stock for ${item.product.name}. Available: ${stock}, required: ${needed}. Produce ${shortfall} more before confirming.`);
                 }
             }
             const outstanding = await (0, gst_util_1.getCustomerOutstanding)(tx, order.customerId);
@@ -249,6 +273,12 @@ let SalesService = class SalesService {
             link: '/delivery',
             actorId: userId,
         });
+        await this.customerNotifications.notifyCustomer(invoice.order.customerId, {
+            type: 'ORDER_CONFIRMED',
+            title: 'Order Confirmed',
+            message: `Your order has been confirmed. Invoice ${invoice.invoiceNo} for ₹${Number(invoice.total).toLocaleString('en-IN')} has been generated.`,
+            refId: invoice.orderId,
+        });
         return invoice;
     }
     async cancelOrder(orderId) {
@@ -258,10 +288,19 @@ let SalesService = class SalesService {
         if (order.status === 'CONFIRMED') {
             throw new common_1.BadRequestException('Cannot cancel confirmed order');
         }
-        return this.prisma.salesOrder.update({
+        const updated = await this.prisma.salesOrder.update({
             where: { id: orderId },
             data: { status: 'CANCELLED' },
         });
+        if (order.notes?.includes('Kedar Foundation')) {
+            await this.customerNotifications.notifyCustomer(order.customerId, {
+                type: 'ORDER_CANCELLED',
+                title: 'Order Cancelled',
+                message: 'Your order was cancelled. Please contact us if you need assistance.',
+                refId: orderId,
+            });
+        }
+        return updated;
     }
     async generateInvoicePdf(invoiceId, res) {
         const invoice = await this.prisma.invoice.findUnique({
@@ -329,6 +368,7 @@ exports.SalesService = SalesService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         config_1.ConfigService,
-        notifications_service_1.NotificationsService])
+        notifications_service_1.NotificationsService,
+        customer_notifications_service_1.CustomerNotificationsService])
 ], SalesService);
 //# sourceMappingURL=sales.service.js.map

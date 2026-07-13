@@ -25,6 +25,22 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         this.prisma = prisma;
     }
     async validate(payload) {
+        if (payload.type === 'foundation') {
+            const account = await this.prisma.foundationAccount.findUnique({
+                where: { id: payload.sub },
+                include: { customer: true },
+            });
+            if (!account || !account.isActive || account.customer.isDeleted || !account.customer.isActive) {
+                throw new common_1.UnauthorizedException();
+            }
+            return {
+                sub: account.id,
+                email: account.email,
+                name: account.customer.name,
+                customerId: account.customerId,
+                type: 'foundation',
+            };
+        }
         const user = await this.prisma.user.findUnique({
             where: { id: payload.sub },
             include: { role: true },
@@ -38,6 +54,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
             name: user.name,
             role: user.role.name,
             permissions: user.role.permissions || [],
+            type: 'erp',
         };
     }
 };
