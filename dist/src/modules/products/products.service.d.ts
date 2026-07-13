@@ -129,4 +129,33 @@ export declare class ProductsService {
         lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
         isDeleted: boolean;
     }>;
+    private toStoreProduct;
+    findStoreCatalog(): Promise<{
+        id: string;
+        slug: string;
+        name: string;
+        category: string;
+        unit: string;
+        unitName: string;
+        price: number;
+        hsnCode: string;
+        gstRate: number;
+        imageUrl: string | null;
+        inStock: boolean;
+        stock: number;
+    }[]>;
+    findStoreProduct(id: string): Promise<{
+        id: string;
+        slug: string;
+        name: string;
+        category: string;
+        unit: string;
+        unitName: string;
+        price: number;
+        hsnCode: string;
+        gstRate: number;
+        imageUrl: string | null;
+        inStock: boolean;
+        stock: number;
+    } | null>;
 }

@@ -13,12 +13,15 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { DeliveryModule } from './modules/delivery/delivery.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { CustomerNotificationsModule } from './modules/customer-notifications/customer-notifications.module';
+import { StoreModule } from './modules/store/store.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     NotificationsModule,
+    CustomerNotificationsModule,
     AuthModule,
     UsersModule,
     ProductsModule,
@@ -29,6 +32,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     PaymentsModule,
     DeliveryModule,
     DashboardModule,
+    StoreModule,
   ],
   controllers: [AppController],
 })

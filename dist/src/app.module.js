@@ -22,6 +22,8 @@ const payments_module_1 = require("./modules/payments/payments.module");
 const delivery_module_1 = require("./modules/delivery/delivery.module");
 const dashboard_module_1 = require("./modules/dashboard/dashboard.module");
 const notifications_module_1 = require("./modules/notifications/notifications.module");
+const customer_notifications_module_1 = require("./modules/customer-notifications/customer-notifications.module");
+const store_module_1 = require("./modules/store/store.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -31,6 +33,7 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({ isGlobal: true }),
             prisma_module_1.PrismaModule,
             notifications_module_1.NotificationsModule,
+            customer_notifications_module_1.CustomerNotificationsModule,
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             products_module_1.ProductsModule,
@@ -41,6 +44,7 @@ exports.AppModule = AppModule = __decorate([
             payments_module_1.PaymentsModule,
             delivery_module_1.DeliveryModule,
             dashboard_module_1.DashboardModule,
+            store_module_1.StoreModule,
         ],
         controllers: [app_controller_1.AppController],
     })
