@@ -9,13 +9,13 @@ export declare class ProductsService {
         gstRate: number;
         lowStockThreshold: number;
         stock: number;
-        unit: {
-            symbol: string;
+        category: {
             id: string;
             name: string;
             createdAt: Date;
         };
-        category: {
+        unit: {
+            symbol: string;
             id: string;
             name: string;
             createdAt: Date;
@@ -23,13 +23,13 @@ export declare class ProductsService {
         id: string;
         name: string;
         isActive: boolean;
+        isDeleted: boolean;
         createdAt: Date;
         updatedAt: Date;
         categoryId: string;
         unitId: string;
         hsnCode: string;
         imageUrl: string | null;
-        isDeleted: boolean;
     }[]>;
     findCategories(): import(".prisma/client").Prisma.PrismaPromise<{
         id: string;
@@ -52,13 +52,13 @@ export declare class ProductsService {
         lowStockThreshold?: number;
         createdBy?: string;
     }): Promise<{
-        unit: {
-            symbol: string;
+        category: {
             id: string;
             name: string;
             createdAt: Date;
         };
-        category: {
+        unit: {
+            symbol: string;
             id: string;
             name: string;
             createdAt: Date;
@@ -67,6 +67,7 @@ export declare class ProductsService {
         id: string;
         name: string;
         isActive: boolean;
+        isDeleted: boolean;
         createdAt: Date;
         updatedAt: Date;
         categoryId: string;
@@ -76,7 +77,6 @@ export declare class ProductsService {
         gstRate: import("@prisma/client/runtime/library").Decimal;
         imageUrl: string | null;
         lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
-        isDeleted: boolean;
     }>;
     update(id: string, data: Partial<{
         name: string;
@@ -88,13 +88,13 @@ export declare class ProductsService {
         lowStockThreshold: number;
         isActive: boolean;
     }>): Promise<{
-        unit: {
-            symbol: string;
+        category: {
             id: string;
             name: string;
             createdAt: Date;
         };
-        category: {
+        unit: {
+            symbol: string;
             id: string;
             name: string;
             createdAt: Date;
@@ -103,6 +103,7 @@ export declare class ProductsService {
         id: string;
         name: string;
         isActive: boolean;
+        isDeleted: boolean;
         createdAt: Date;
         updatedAt: Date;
         categoryId: string;
@@ -112,12 +113,12 @@ export declare class ProductsService {
         gstRate: import("@prisma/client/runtime/library").Decimal;
         imageUrl: string | null;
         lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
-        isDeleted: boolean;
     }>;
     remove(id: string): Promise<{
         id: string;
         name: string;
         isActive: boolean;
+        isDeleted: boolean;
         createdAt: Date;
         updatedAt: Date;
         categoryId: string;
@@ -127,9 +128,11 @@ export declare class ProductsService {
         gstRate: import("@prisma/client/runtime/library").Decimal;
         imageUrl: string | null;
         lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
-        isDeleted: boolean;
     }>;
+<<<<<<< HEAD
     private toStoreProduct;
+=======
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     findStoreCatalog(): Promise<{
         id: string;
         slug: string;
@@ -142,6 +145,10 @@ export declare class ProductsService {
         gstRate: number;
         imageUrl: string | null;
         inStock: boolean;
+<<<<<<< HEAD
+=======
+        stock: number;
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     }[]>;
     findStoreProduct(id: string): Promise<{
         id: string;
@@ -155,5 +162,11 @@ export declare class ProductsService {
         gstRate: number;
         imageUrl: string | null;
         inStock: boolean;
+<<<<<<< HEAD
     } | null>;
+=======
+        stock: number;
+    } | null>;
+    private toStoreProduct;
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 }

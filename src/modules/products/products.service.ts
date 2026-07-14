@@ -95,6 +95,7 @@ export class ProductsService {
     });
   }
 
+<<<<<<< HEAD
   private toStoreProduct(
     product: {
       id: string;
@@ -128,12 +129,16 @@ export class ProductsService {
     };
   }
 
+=======
+  /** Public storefront catalogue (Kedar Foundation website). */
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
   async findStoreCatalog() {
     const products = await this.prisma.product.findMany({
       where: { isDeleted: false, isActive: true },
       include: { category: true, unit: true },
       orderBy: { name: 'asc' },
     });
+<<<<<<< HEAD
 
     return Promise.all(
       products.map(async (product) => {
@@ -141,10 +146,14 @@ export class ProductsService {
         return this.toStoreProduct(product, stock);
       }),
     );
+=======
+    return Promise.all(products.map((p) => this.toStoreProduct(p)));
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
   }
 
   async findStoreProduct(id: string) {
     const product = await this.prisma.product.findFirst({
+<<<<<<< HEAD
       where: {
         isDeleted: false,
         isActive: true,
@@ -157,5 +166,39 @@ export class ProductsService {
 
     const stock = await getProductStock(this.prisma, product.id);
     return this.toStoreProduct(product, stock);
+=======
+      where: { id, isDeleted: false, isActive: true },
+      include: { category: true, unit: true },
+    });
+    if (!product) return null;
+    return this.toStoreProduct(product);
+  }
+
+  private async toStoreProduct(p: {
+    id: string;
+    name: string;
+    price: unknown;
+    hsnCode: string;
+    gstRate: unknown;
+    imageUrl: string | null;
+    category: { name: string };
+    unit: { name: string; symbol: string };
+  }) {
+    const stock = await getProductStock(this.prisma, p.id);
+    return {
+      id: p.id,
+      slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      name: p.name,
+      category: p.category.name,
+      unit: p.unit.symbol,
+      unitName: p.unit.name,
+      price: Number(p.price),
+      hsnCode: p.hsnCode,
+      gstRate: Number(p.gstRate),
+      imageUrl: p.imageUrl,
+      inStock: stock > 0,
+      stock,
+    };
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
   }
 }

@@ -12,7 +12,10 @@ import PDFKit = require('pdfkit');
 import { Response } from 'express';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CustomerNotificationsService } from '../customer-notifications/customer-notifications.service';
+<<<<<<< HEAD
 import { isWebsiteOrder, parseAwaitingStockNotes } from '../../common/utils/store.util';
+=======
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 
 @Injectable()
 export class SalesService {
@@ -51,6 +54,7 @@ export class SalesService {
     notes?: string;
     items: { productId: string; qty: number; rate: number }[];
     createdBy?: string;
+    sourceMessage?: string;
   }) {
     if (!data.items?.length) {
       throw new BadRequestException('Order must have at least one item');
@@ -80,6 +84,7 @@ export class SalesService {
       ? await this.prisma.user.findUnique({ where: { id: data.createdBy } })
       : null;
 
+<<<<<<< HEAD
     if (!isWebsiteOrder(data.notes)) {
       await this.notifications.notifyByModule({
         module: 'sales',
@@ -91,6 +96,18 @@ export class SalesService {
         actorId: data.createdBy,
       });
     }
+=======
+    await this.notifications.notifyByModule({
+      module: 'sales',
+      type: 'ORDER_CREATED',
+      title: 'New Sales Order',
+      message: data.sourceMessage
+        || `${actor?.name || 'Sales'} created a draft order for ${order.customer.name}`,
+      refId: order.id,
+      link: '/sales',
+      actorId: data.createdBy,
+    });
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 
     return order;
   }
@@ -104,7 +121,7 @@ export class SalesService {
         where: { id: orderId },
         include: {
           customer: true,
-          items: { include: { product: true } },
+          items: { include: { product: { include: { unit: true } } } },
           invoice: true,
         },
       });
@@ -119,9 +136,30 @@ export class SalesService {
 
       for (const item of order.items) {
         const stock = await getProductStock(tx as unknown as PrismaService, item.productId);
-        if (stock < Number(item.qty)) {
+        const needed = Number(item.qty);
+        if (stock < needed) {
+          const shortfall = needed - stock;
+          const unit = item.product.unit?.symbol ?? 'units';
+          await this.notifications.notifyByModule({
+            module: 'manufacturing',
+            type: 'PRODUCTION_REQUIRED',
+            title: 'Cannot Confirm — Production Needed',
+            message: `Order for ${order.customer.name}: ${item.product.name} needs ${shortfall} more ${unit} (have ${stock}, need ${needed}). Produce before confirming.`,
+            refId: orderId,
+            link: '/manufacturing',
+            actorId: userId,
+          });
+          await this.notifications.notifyByModule({
+            module: 'inventory',
+            type: 'CONFIRM_BLOCKED',
+            title: 'Order Confirmation Blocked',
+            message: `Insufficient stock for ${item.product.name} (${stock} available, ${needed} required). Order cannot be confirmed until stock is available.`,
+            refId: orderId,
+            link: '/inventory',
+            actorId: userId,
+          });
           throw new BadRequestException(
-            `Insufficient stock for ${item.product.name}. Available: ${stock}`,
+            `Insufficient stock for ${item.product.name}. Available: ${stock}, required: ${needed}. Produce ${shortfall} more before confirming.`,
           );
         }
       }
@@ -295,6 +333,7 @@ export class SalesService {
       actorId: userId,
     });
 
+<<<<<<< HEAD
     if (isWebsiteOrder(invoice.order.notes)) {
       await this.customerNotifications.notifyCustomer(invoice.order.customerId, {
         type: 'ORDER_CONFIRMED',
@@ -303,6 +342,14 @@ export class SalesService {
         refId: invoice.orderId,
       });
     }
+=======
+    await this.customerNotifications.notifyCustomer(invoice.order.customerId, {
+      type: 'ORDER_CONFIRMED',
+      title: 'Order Confirmed',
+      message: `Your order has been confirmed. Invoice ${invoice.invoiceNo} for ₹${Number(invoice.total).toLocaleString('en-IN')} has been generated.`,
+      refId: invoice.orderId,
+    });
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 
     return invoice;
   }
@@ -341,12 +388,21 @@ export class SalesService {
       data: { status: 'CANCELLED' },
     });
 
+<<<<<<< HEAD
     if (isWebsiteOrder(order.notes)) {
       await this.customerNotifications.notifyCustomer(order.customerId, {
         type: 'ORDER_CANCELLED',
         title: 'Order Cancelled',
         message: 'Your order was cancelled. Contact us if you need help placing a new order.',
         refId: order.id,
+=======
+    if (order.notes?.includes('Kedar Foundation')) {
+      await this.customerNotifications.notifyCustomer(order.customerId, {
+        type: 'ORDER_CANCELLED',
+        title: 'Order Cancelled',
+        message: 'Your order was cancelled. Please contact us if you need assistance.',
+        refId: orderId,
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
       });
     }
 

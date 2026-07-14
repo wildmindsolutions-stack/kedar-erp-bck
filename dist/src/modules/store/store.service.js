@@ -19,7 +19,10 @@ const sales_service_1 = require("../sales/sales.service");
 const notifications_service_1 = require("../notifications/notifications.service");
 const customer_notifications_service_1 = require("../customer-notifications/customer-notifications.service");
 const gst_util_1 = require("../../common/utils/gst.util");
+<<<<<<< HEAD
 const store_util_1 = require("../../common/utils/store.util");
+=======
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 let StoreService = class StoreService {
     constructor(prisma, jwt, customersService, salesService, notifications, customerNotifications) {
         this.prisma = prisma;
@@ -136,6 +139,7 @@ let StoreService = class StoreService {
             where: { email },
             include: { customer: true },
         });
+<<<<<<< HEAD
         if (!account
             || !account.isActive
             || account.customer.isDeleted
@@ -174,14 +178,30 @@ let StoreService = class StoreService {
         });
         return { message: 'Password updated successfully. You can now log in.' };
     }
+=======
+        if (!account || !account.isActive || account.customer.isDeleted || !account.customer.isActive) {
+            throw new common_1.UnauthorizedException('Invalid credentials');
+        }
+        const valid = await bcrypt.compare(dto.password, account.passwordHash);
+        if (!valid)
+            throw new common_1.UnauthorizedException('Invalid credentials');
+        const accessToken = this.signToken(account.id, email, account.customerId);
+        return { accessToken, user: this.toProfile(account) };
+    }
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     async getProfile(accountId) {
         const account = await this.prisma.foundationAccount.findUnique({
             where: { id: accountId },
             include: { customer: true },
         });
+<<<<<<< HEAD
         if (!account || !account.isActive) {
             throw new common_1.UnauthorizedException();
         }
+=======
+        if (!account || !account.isActive)
+            throw new common_1.UnauthorizedException();
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
         return this.toProfile(account);
     }
     async placeOrder(customerId, dto) {
@@ -191,11 +211,17 @@ let StoreService = class StoreService {
         const customer = await this.prisma.customer.findFirst({
             where: { id: customerId, isDeleted: false, isActive: true },
         });
+<<<<<<< HEAD
         if (!customer) {
             throw new common_1.UnauthorizedException('Customer account not found');
         }
         const stockChecks = [];
         const validatedItems = [];
+=======
+        if (!customer)
+            throw new common_1.UnauthorizedException('Customer account not found');
+        const stockChecks = [];
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
         for (const item of dto.items) {
             const product = await this.prisma.product.findFirst({
                 where: { id: item.productId, isDeleted: false, isActive: true },
@@ -209,6 +235,12 @@ let StoreService = class StoreService {
             if (ordered < 1) {
                 throw new common_1.BadRequestException(`Invalid quantity for ${product.name}`);
             }
+<<<<<<< HEAD
+=======
+            if (available < 1 && ordered > 0) {
+                throw new common_1.BadRequestException(`${product.name} is out of stock.`);
+            }
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
             const shortfall = Math.max(0, ordered - available);
             stockChecks.push({
                 productId: product.id,
@@ -218,11 +250,14 @@ let StoreService = class StoreService {
                 available,
                 shortfall,
             });
+<<<<<<< HEAD
             validatedItems.push({
                 productId: product.id,
                 qty: ordered,
                 rate: Number(product.price),
             });
+=======
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
         }
         const awaitingStock = stockChecks.filter((s) => s.shortfall > 0);
         const orderDate = new Date().toISOString().slice(0, 10);
@@ -234,18 +269,35 @@ let StoreService = class StoreService {
         const order = await this.salesService.createOrder({
             customerId,
             orderDate,
+<<<<<<< HEAD
             items: validatedItems,
             notes,
         });
         await this.notifications.notifyByModule({
             module: 'sales',
+=======
+            items: dto.items.map((i) => ({
+                productId: i.productId,
+                qty: Number(i.qty),
+                rate: Number(i.rate),
+            })),
+            notes,
+            sourceMessage: `${customer.name} placed a new order via Kedar Foundation website`,
+        });
+        await this.notifications.notifyByModule({
+            module: 'payments',
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
             type: 'WEBSITE_ORDER_RECEIVED',
             title: 'New Website Order',
             message: awaitingStock.length
                 ? `Draft order from ${customer.name} — awaiting stock before confirmation`
                 : `Draft order from ${customer.name} — review in Sales & Billing`,
             refId: order.id,
+<<<<<<< HEAD
             link: `/sales?highlight=${order.id}`,
+=======
+            link: '/sales',
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
         });
         if (awaitingStock.length) {
             for (const s of awaitingStock) {
@@ -255,7 +307,11 @@ let StoreService = class StoreService {
                     title: 'Production Required for Website Order',
                     message: `${customer.name} ordered ${s.ordered} ${s.unit} of ${s.productName}. Only ${s.available} ${s.unit} in stock — produce ${s.shortfall} ${s.unit} before order can be confirmed.`,
                     refId: order.id,
+<<<<<<< HEAD
                     link: `/manufacturing?order=${order.id}`,
+=======
+                    link: '/manufacturing',
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
                 });
                 await this.notifications.notifyByModule({
                     module: 'inventory',
@@ -263,7 +319,11 @@ let StoreService = class StoreService {
                     title: 'Stock Shortfall on Website Order',
                     message: `${s.productName}: ${s.available} ${s.unit} available, ${s.ordered} ${s.unit} ordered. Reserve existing stock and plan replenishment.`,
                     refId: order.id,
+<<<<<<< HEAD
                     link: `/inventory?order=${order.id}`,
+=======
+                    link: '/inventory',
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
                 });
             }
             await this.customerNotifications.notifyCustomer(customerId, {
@@ -296,8 +356,12 @@ let StoreService = class StoreService {
         return this.customerNotifications.markAllRead(customerId);
     }
     getOrders(customerId) {
+<<<<<<< HEAD
         return this.prisma.salesOrder
             .findMany({
+=======
+        return this.prisma.salesOrder.findMany({
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
             where: { customerId },
             include: {
                 items: { include: { product: { include: { unit: true } } } },
@@ -309,8 +373,12 @@ let StoreService = class StoreService {
                 },
             },
             orderBy: { createdAt: 'desc' },
+<<<<<<< HEAD
         })
             .then((orders) => orders.map((order) => ({
+=======
+        }).then((orders) => orders.map((order) => ({
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
             ...order,
             items: order.items.map((i) => ({
                 ...i,
@@ -352,6 +420,7 @@ let StoreService = class StoreService {
                 order: { customerId },
             },
         });
+<<<<<<< HEAD
         if (!invoice) {
             throw new common_1.NotFoundException('Invoice not found');
         }
@@ -414,6 +483,12 @@ let StoreService = class StoreService {
         });
         return { message: 'Thank you for reaching out. Our team will get back to you shortly.' };
     }
+=======
+        if (!invoice)
+            throw new common_1.NotFoundException('Invoice not found');
+        return this.salesService.generateInvoicePdf(invoiceId, res);
+    }
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 };
 exports.StoreService = StoreService;
 exports.StoreService = StoreService = __decorate([

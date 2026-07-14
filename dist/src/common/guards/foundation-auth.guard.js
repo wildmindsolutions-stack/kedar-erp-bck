@@ -9,7 +9,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FoundationAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
+<<<<<<< HEAD
 let FoundationAuthGuard = class FoundationAuthGuard extends (0, passport_1.AuthGuard)('foundation-jwt') {
+=======
+let FoundationAuthGuard = class FoundationAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
+    handleRequest(err, user, _info, _context) {
+        if (err || !user) {
+            throw err || new common_1.UnauthorizedException('Please log in to continue');
+        }
+        if (user.type !== 'foundation') {
+            throw new common_1.UnauthorizedException('Please log in with your Kedar Foundation customer account');
+        }
+        return user;
+    }
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 };
 exports.FoundationAuthGuard = FoundationAuthGuard;
 exports.FoundationAuthGuard = FoundationAuthGuard = __decorate([

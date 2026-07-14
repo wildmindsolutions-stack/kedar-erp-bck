@@ -12,6 +12,10 @@ export interface CustomerNotifyPayload {
 export class CustomerNotificationsService {
   constructor(private prisma: PrismaService) {}
 
+<<<<<<< HEAD
+=======
+  /** Notify website customer if they have a Foundation account. */
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
   async notifyCustomer(customerId: string, payload: CustomerNotifyPayload) {
     const account = await this.prisma.foundationAccount.findUnique({
       where: { customerId },

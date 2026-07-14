@@ -1,9 +1,14 @@
 import {
+<<<<<<< HEAD
   Body, Controller, Get, NotFoundException, Param, Patch, Post, Req, Res, UseGuards,
+=======
+  Controller, Get, Post, Body, UseGuards, Req, Param, NotFoundException, Patch, Res,
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 } from '@nestjs/common';
 import { Response } from 'express';
 import { StoreService } from './store.service';
 import { ProductsService } from '../products/products.service';
+<<<<<<< HEAD
 import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto, StoreResetPasswordDto, StoreUpdateProfileDto, StoreContactDto } from './store.dto';
 import { FoundationAuthGuard } from '../../common/guards/foundation-auth.guard';
 
@@ -15,6 +20,16 @@ interface FoundationRequest {
   };
 }
 
+=======
+import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto } from './store.dto';
+import { FoundationAuthGuard } from '../../common/guards/foundation-auth.guard';
+
+interface FoundationRequest {
+  user: { sub: string; customerId: string; type: string };
+}
+
+/** Public catalogue + foundation customer auth & orders. */
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 @Controller('store')
 export class StoreController {
   constructor(
@@ -30,9 +45,13 @@ export class StoreController {
   @Get('products/:id')
   async findProduct(@Param('id') id: string) {
     const product = await this.productsService.findStoreProduct(id);
+<<<<<<< HEAD
     if (!product) {
       throw new NotFoundException('Product not found');
     }
+=======
+    if (!product) throw new NotFoundException('Product not found');
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     return product;
   }
 
@@ -46,23 +65,29 @@ export class StoreController {
     return this.storeService.login(dto);
   }
 
+<<<<<<< HEAD
   @Post('auth/reset-password')
   resetPassword(@Body() dto: StoreResetPasswordDto) {
     return this.storeService.resetPassword(dto);
   }
 
+=======
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
   @Get('auth/me')
   @UseGuards(FoundationAuthGuard)
   me(@Req() req: FoundationRequest) {
     return this.storeService.getProfile(req.user.sub);
   }
 
+<<<<<<< HEAD
   @Patch('auth/profile')
   @UseGuards(FoundationAuthGuard)
   updateProfile(@Req() req: FoundationRequest, @Body() dto: StoreUpdateProfileDto) {
     return this.storeService.updateProfile(req.user.sub, dto);
   }
 
+=======
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
   @Post('orders')
   @UseGuards(FoundationAuthGuard)
   placeOrder(@Req() req: FoundationRequest, @Body() dto: StorePlaceOrderDto) {
@@ -75,6 +100,7 @@ export class StoreController {
     return this.storeService.getOrders(req.user.customerId);
   }
 
+<<<<<<< HEAD
   @Post('orders/:id/cancel')
   @UseGuards(FoundationAuthGuard)
   cancelOrder(@Req() req: FoundationRequest, @Param('id') id: string) {
@@ -86,6 +112,8 @@ export class StoreController {
     return this.storeService.submitContact(dto);
   }
 
+=======
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
   @Get('invoices/:id/pdf')
   @UseGuards(FoundationAuthGuard)
   getInvoicePdf(

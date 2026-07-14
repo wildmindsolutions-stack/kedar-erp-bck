@@ -14,7 +14,10 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const notifications_service_1 = require("../notifications/notifications.service");
 const customer_notifications_service_1 = require("../customer-notifications/customer-notifications.service");
+<<<<<<< HEAD
 const store_util_1 = require("../../common/utils/store.util");
+=======
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 let DeliveryService = class DeliveryService {
     constructor(prisma, notifications, customerNotifications) {
         this.prisma = prisma;
@@ -93,6 +96,7 @@ let DeliveryService = class DeliveryService {
             link: '/delivery',
             actorId: data.actorId,
         });
+<<<<<<< HEAD
         if ((0, store_util_1.isWebsiteOrder)(delivery.invoice.order.notes)) {
             await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
                 type: 'ORDER_DISPATCHED',
@@ -101,6 +105,15 @@ let DeliveryService = class DeliveryService {
                 refId: delivery.invoice.orderId,
             });
         }
+=======
+        const vehicleInfo = delivery.vehicle ? ` Vehicle: ${delivery.vehicle}.` : '';
+        await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
+            type: 'ORDER_DISPATCHED',
+            title: 'Order Dispatched',
+            message: `Your order is on the way! Challan ${delivery.challanNo}.${vehicleInfo}`,
+            refId: delivery.invoice.orderId,
+        });
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
         return delivery;
     }
     async markDelivered(id, actorId) {
@@ -118,6 +131,7 @@ let DeliveryService = class DeliveryService {
             link: '/delivery',
             actorId,
         });
+<<<<<<< HEAD
         if ((0, store_util_1.isWebsiteOrder)(delivery.invoice.order.notes)) {
             await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
                 type: 'ORDER_DELIVERED',
@@ -126,6 +140,14 @@ let DeliveryService = class DeliveryService {
                 refId: delivery.invoice.orderId,
             });
         }
+=======
+        await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
+            type: 'ORDER_DELIVERED',
+            title: 'Order Delivered',
+            message: `Your order has been delivered successfully. Thank you for choosing Kedar Foundation!`,
+            refId: delivery.invoice.orderId,
+        });
+>>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
         return delivery;
     }
 };
