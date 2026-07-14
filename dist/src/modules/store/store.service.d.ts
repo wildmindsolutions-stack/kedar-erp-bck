@@ -5,11 +5,7 @@ import { CustomersService } from '../customers/customers.service';
 import { SalesService } from '../sales/sales.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CustomerNotificationsService } from '../customer-notifications/customer-notifications.service';
-<<<<<<< HEAD
 import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto, StoreResetPasswordDto, StoreUpdateProfileDto, StoreContactDto } from './store.dto';
-=======
-import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto } from './store.dto';
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 export declare class StoreService {
     private prisma;
     private jwt;
@@ -50,12 +46,9 @@ export declare class StoreService {
             type: "foundation";
         };
     }>;
-<<<<<<< HEAD
     resetPassword(dto: StoreResetPasswordDto): Promise<{
         message: string;
     }>;
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     getProfile(accountId: string): Promise<{
         id: string;
         customerId: string;
@@ -79,7 +72,6 @@ export declare class StoreService {
         customer: {
             id: string;
             name: string;
-<<<<<<< HEAD
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
@@ -87,32 +79,16 @@ export declare class StoreService {
             isDeleted: boolean;
             gstin: string | null;
             phone: string | null;
-=======
-            gstin: string | null;
-            phone: string | null;
-            email: string | null;
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
             address: string | null;
             city: string | null;
             state: string;
             creditLimit: import("@prisma/client/runtime/library").Decimal;
-<<<<<<< HEAD
-=======
-            isActive: boolean;
-            isDeleted: boolean;
-            createdAt: Date;
-            updatedAt: Date;
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
         };
         items: ({
             product: {
                 id: string;
                 name: string;
                 isActive: boolean;
-<<<<<<< HEAD
-=======
-                isDeleted: boolean;
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
                 createdAt: Date;
                 updatedAt: Date;
                 categoryId: string;
@@ -122,23 +98,14 @@ export declare class StoreService {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
-<<<<<<< HEAD
                 isDeleted: boolean;
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
             };
         } & {
             id: string;
             productId: string;
-<<<<<<< HEAD
             orderId: string;
             qty: import("@prisma/client/runtime/library").Decimal;
             rate: import("@prisma/client/runtime/library").Decimal;
-=======
-            qty: import("@prisma/client/runtime/library").Decimal;
-            rate: import("@prisma/client/runtime/library").Decimal;
-            orderId: string;
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
         })[];
         id: string;
         createdAt: Date;
@@ -177,10 +144,6 @@ export declare class StoreService {
                 id: string;
                 name: string;
                 isActive: boolean;
-<<<<<<< HEAD
-=======
-                isDeleted: boolean;
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
                 createdAt: Date;
                 updatedAt: Date;
                 categoryId: string;
@@ -190,10 +153,7 @@ export declare class StoreService {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
-<<<<<<< HEAD
                 isDeleted: boolean;
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
             };
             id: string;
             productId: string;
@@ -234,10 +194,6 @@ export declare class StoreService {
                     id: string;
                     name: string;
                     isActive: boolean;
-<<<<<<< HEAD
-=======
-                    isDeleted: boolean;
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
                     createdAt: Date;
                     updatedAt: Date;
                     categoryId: string;
@@ -247,10 +203,7 @@ export declare class StoreService {
                     gstRate: import("@prisma/client/runtime/library").Decimal;
                     imageUrl: string | null;
                     lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
-<<<<<<< HEAD
                     isDeleted: boolean;
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
                 };
                 id: string;
                 hsnCode: string;
@@ -268,7 +221,6 @@ export declare class StoreService {
         orderDate: Date;
     }[]>;
     getInvoicePdf(customerId: string, invoiceId: string, res: Response): Promise<void>;
-<<<<<<< HEAD
     updateProfile(accountId: string, dto: StoreUpdateProfileDto): Promise<{
         id: string;
         customerId: string;
@@ -292,6 +244,4 @@ export declare class StoreService {
     submitContact(dto: StoreContactDto): Promise<{
         message: string;
     }>;
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 }

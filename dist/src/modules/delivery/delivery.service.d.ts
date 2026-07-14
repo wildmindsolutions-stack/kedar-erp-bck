@@ -11,17 +11,17 @@ export declare class DeliveryService {
             customer: {
                 id: string;
                 name: string;
+                isActive: boolean;
+                createdAt: Date;
+                updatedAt: Date;
+                email: string | null;
+                isDeleted: boolean;
                 gstin: string | null;
                 phone: string | null;
-                email: string | null;
                 address: string | null;
                 city: string | null;
                 state: string;
                 creditLimit: import("@prisma/client/runtime/library").Decimal;
-                isActive: boolean;
-                isDeleted: boolean;
-                createdAt: Date;
-                updatedAt: Date;
             };
         } & {
             id: string;
@@ -35,8 +35,9 @@ export declare class DeliveryService {
         };
     } & {
         id: string;
-        isDeleted: boolean;
         createdAt: Date;
+        isDeleted: boolean;
+        financialYear: string;
         status: import(".prisma/client").$Enums.InvoiceStatus;
         orderId: string;
         invoiceNo: string;
@@ -49,7 +50,6 @@ export declare class DeliveryService {
         sellerGstin: string;
         buyerGstin: string | null;
         issuedAt: Date;
-        financialYear: string;
     })[]>;
     findAll(): import(".prisma/client").Prisma.PrismaPromise<({
         invoice: {
@@ -57,17 +57,17 @@ export declare class DeliveryService {
                 customer: {
                     id: string;
                     name: string;
+                    isActive: boolean;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    email: string | null;
+                    isDeleted: boolean;
                     gstin: string | null;
                     phone: string | null;
-                    email: string | null;
                     address: string | null;
                     city: string | null;
                     state: string;
                     creditLimit: import("@prisma/client/runtime/library").Decimal;
-                    isActive: boolean;
-                    isDeleted: boolean;
-                    createdAt: Date;
-                    updatedAt: Date;
                 };
             } & {
                 id: string;
@@ -81,8 +81,9 @@ export declare class DeliveryService {
             };
         } & {
             id: string;
-            isDeleted: boolean;
             createdAt: Date;
+            isDeleted: boolean;
+            financialYear: string;
             status: import(".prisma/client").$Enums.InvoiceStatus;
             orderId: string;
             invoiceNo: string;
@@ -95,7 +96,6 @@ export declare class DeliveryService {
             sellerGstin: string;
             buyerGstin: string | null;
             issuedAt: Date;
-            financialYear: string;
         };
     } & {
         id: string;
@@ -121,17 +121,17 @@ export declare class DeliveryService {
                 customer: {
                     id: string;
                     name: string;
+                    isActive: boolean;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    email: string | null;
+                    isDeleted: boolean;
                     gstin: string | null;
                     phone: string | null;
-                    email: string | null;
                     address: string | null;
                     city: string | null;
                     state: string;
                     creditLimit: import("@prisma/client/runtime/library").Decimal;
-                    isActive: boolean;
-                    isDeleted: boolean;
-                    createdAt: Date;
-                    updatedAt: Date;
                 };
             } & {
                 id: string;
@@ -145,8 +145,9 @@ export declare class DeliveryService {
             };
         } & {
             id: string;
-            isDeleted: boolean;
             createdAt: Date;
+            isDeleted: boolean;
+            financialYear: string;
             status: import(".prisma/client").$Enums.InvoiceStatus;
             orderId: string;
             invoiceNo: string;
@@ -159,7 +160,6 @@ export declare class DeliveryService {
             sellerGstin: string;
             buyerGstin: string | null;
             issuedAt: Date;
-            financialYear: string;
         };
     } & {
         id: string;
@@ -183,17 +183,17 @@ export declare class DeliveryService {
                 customer: {
                     id: string;
                     name: string;
+                    isActive: boolean;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    email: string | null;
+                    isDeleted: boolean;
                     gstin: string | null;
                     phone: string | null;
-                    email: string | null;
                     address: string | null;
                     city: string | null;
                     state: string;
                     creditLimit: import("@prisma/client/runtime/library").Decimal;
-                    isActive: boolean;
-                    isDeleted: boolean;
-                    createdAt: Date;
-                    updatedAt: Date;
                 };
             } & {
                 id: string;
@@ -207,8 +207,9 @@ export declare class DeliveryService {
             };
         } & {
             id: string;
-            isDeleted: boolean;
             createdAt: Date;
+            isDeleted: boolean;
+            financialYear: string;
             status: import(".prisma/client").$Enums.InvoiceStatus;
             orderId: string;
             invoiceNo: string;
@@ -221,7 +222,6 @@ export declare class DeliveryService {
             sellerGstin: string;
             buyerGstin: string | null;
             issuedAt: Date;
-            financialYear: string;
         };
     } & {
         id: string;
@@ -241,17 +241,17 @@ export declare class DeliveryService {
                 customer: {
                     id: string;
                     name: string;
+                    isActive: boolean;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    email: string | null;
+                    isDeleted: boolean;
                     gstin: string | null;
                     phone: string | null;
-                    email: string | null;
                     address: string | null;
                     city: string | null;
                     state: string;
                     creditLimit: import("@prisma/client/runtime/library").Decimal;
-                    isActive: boolean;
-                    isDeleted: boolean;
-                    createdAt: Date;
-                    updatedAt: Date;
                 };
             } & {
                 id: string;
@@ -265,8 +265,9 @@ export declare class DeliveryService {
             };
         } & {
             id: string;
-            isDeleted: boolean;
             createdAt: Date;
+            isDeleted: boolean;
+            financialYear: string;
             status: import(".prisma/client").$Enums.InvoiceStatus;
             orderId: string;
             invoiceNo: string;
@@ -279,7 +280,6 @@ export declare class DeliveryService {
             sellerGstin: string;
             buyerGstin: string | null;
             issuedAt: Date;
-            financialYear: string;
         };
     } & {
         id: string;

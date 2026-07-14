@@ -13,45 +13,23 @@ export declare class SalesService {
         customer: {
             id: string;
             name: string;
+            isActive: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+            email: string | null;
+            isDeleted: boolean;
             gstin: string | null;
             phone: string | null;
-            email: string | null;
             address: string | null;
             city: string | null;
             state: string;
             creditLimit: import("@prisma/client/runtime/library").Decimal;
-            isActive: boolean;
-            isDeleted: boolean;
-            createdAt: Date;
-            updatedAt: Date;
         };
-        items: ({
-            product: {
-                id: string;
-                name: string;
-                isActive: boolean;
-                isDeleted: boolean;
-                createdAt: Date;
-                updatedAt: Date;
-                categoryId: string;
-                unitId: string;
-                price: import("@prisma/client/runtime/library").Decimal;
-                hsnCode: string;
-                gstRate: import("@prisma/client/runtime/library").Decimal;
-                imageUrl: string | null;
-                lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
-            };
-        } & {
-            id: string;
-            productId: string;
-            qty: import("@prisma/client/runtime/library").Decimal;
-            rate: import("@prisma/client/runtime/library").Decimal;
-            orderId: string;
-        })[];
         invoice: {
             id: string;
-            isDeleted: boolean;
             createdAt: Date;
+            isDeleted: boolean;
+            financialYear: string;
             status: import(".prisma/client").$Enums.InvoiceStatus;
             orderId: string;
             invoiceNo: string;
@@ -64,8 +42,30 @@ export declare class SalesService {
             sellerGstin: string;
             buyerGstin: string | null;
             issuedAt: Date;
-            financialYear: string;
         } | null;
+        items: ({
+            product: {
+                id: string;
+                name: string;
+                isActive: boolean;
+                createdAt: Date;
+                updatedAt: Date;
+                categoryId: string;
+                unitId: string;
+                price: import("@prisma/client/runtime/library").Decimal;
+                hsnCode: string;
+                gstRate: import("@prisma/client/runtime/library").Decimal;
+                imageUrl: string | null;
+                lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
+            };
+        } & {
+            id: string;
+            productId: string;
+            orderId: string;
+            qty: import("@prisma/client/runtime/library").Decimal;
+            rate: import("@prisma/client/runtime/library").Decimal;
+        })[];
     } & {
         id: string;
         createdAt: Date;
@@ -82,7 +82,6 @@ export declare class SalesService {
                 id: string;
                 name: string;
                 isActive: boolean;
-                isDeleted: boolean;
                 createdAt: Date;
                 updatedAt: Date;
                 categoryId: string;
@@ -92,6 +91,7 @@ export declare class SalesService {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
         } & {
             id: string;
@@ -100,28 +100,28 @@ export declare class SalesService {
             productId: string;
             qty: import("@prisma/client/runtime/library").Decimal;
             rate: import("@prisma/client/runtime/library").Decimal;
-            invoiceId: string;
             taxable: import("@prisma/client/runtime/library").Decimal;
             cgst: import("@prisma/client/runtime/library").Decimal;
             sgst: import("@prisma/client/runtime/library").Decimal;
             igst: import("@prisma/client/runtime/library").Decimal;
             lineTotal: import("@prisma/client/runtime/library").Decimal;
+            invoiceId: string;
         })[];
         order: {
             customer: {
                 id: string;
                 name: string;
+                isActive: boolean;
+                createdAt: Date;
+                updatedAt: Date;
+                email: string | null;
+                isDeleted: boolean;
                 gstin: string | null;
                 phone: string | null;
-                email: string | null;
                 address: string | null;
                 city: string | null;
                 state: string;
                 creditLimit: import("@prisma/client/runtime/library").Decimal;
-                isActive: boolean;
-                isDeleted: boolean;
-                createdAt: Date;
-                updatedAt: Date;
             };
         } & {
             id: string;
@@ -135,8 +135,9 @@ export declare class SalesService {
         };
     } & {
         id: string;
-        isDeleted: boolean;
         createdAt: Date;
+        isDeleted: boolean;
+        financialYear: string;
         status: import(".prisma/client").$Enums.InvoiceStatus;
         orderId: string;
         invoiceNo: string;
@@ -149,7 +150,6 @@ export declare class SalesService {
         sellerGstin: string;
         buyerGstin: string | null;
         issuedAt: Date;
-        financialYear: string;
     })[]>;
     createOrder(data: {
         customerId: string;
@@ -166,24 +166,23 @@ export declare class SalesService {
         customer: {
             id: string;
             name: string;
+            isActive: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+            email: string | null;
+            isDeleted: boolean;
             gstin: string | null;
             phone: string | null;
-            email: string | null;
             address: string | null;
             city: string | null;
             state: string;
             creditLimit: import("@prisma/client/runtime/library").Decimal;
-            isActive: boolean;
-            isDeleted: boolean;
-            createdAt: Date;
-            updatedAt: Date;
         };
         items: ({
             product: {
                 id: string;
                 name: string;
                 isActive: boolean;
-                isDeleted: boolean;
                 createdAt: Date;
                 updatedAt: Date;
                 categoryId: string;
@@ -193,13 +192,14 @@ export declare class SalesService {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
         } & {
             id: string;
             productId: string;
+            orderId: string;
             qty: import("@prisma/client/runtime/library").Decimal;
             rate: import("@prisma/client/runtime/library").Decimal;
-            orderId: string;
         })[];
     } & {
         id: string;
@@ -217,7 +217,6 @@ export declare class SalesService {
                 id: string;
                 name: string;
                 isActive: boolean;
-                isDeleted: boolean;
                 createdAt: Date;
                 updatedAt: Date;
                 categoryId: string;
@@ -227,6 +226,7 @@ export declare class SalesService {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
         } & {
             id: string;
@@ -235,28 +235,28 @@ export declare class SalesService {
             productId: string;
             qty: import("@prisma/client/runtime/library").Decimal;
             rate: import("@prisma/client/runtime/library").Decimal;
-            invoiceId: string;
             taxable: import("@prisma/client/runtime/library").Decimal;
             cgst: import("@prisma/client/runtime/library").Decimal;
             sgst: import("@prisma/client/runtime/library").Decimal;
             igst: import("@prisma/client/runtime/library").Decimal;
             lineTotal: import("@prisma/client/runtime/library").Decimal;
+            invoiceId: string;
         })[];
         order: {
             customer: {
                 id: string;
                 name: string;
+                isActive: boolean;
+                createdAt: Date;
+                updatedAt: Date;
+                email: string | null;
+                isDeleted: boolean;
                 gstin: string | null;
                 phone: string | null;
-                email: string | null;
                 address: string | null;
                 city: string | null;
                 state: string;
                 creditLimit: import("@prisma/client/runtime/library").Decimal;
-                isActive: boolean;
-                isDeleted: boolean;
-                createdAt: Date;
-                updatedAt: Date;
             };
         } & {
             id: string;
@@ -270,8 +270,9 @@ export declare class SalesService {
         };
     } & {
         id: string;
-        isDeleted: boolean;
         createdAt: Date;
+        isDeleted: boolean;
+        financialYear: string;
         status: import(".prisma/client").$Enums.InvoiceStatus;
         orderId: string;
         invoiceNo: string;
@@ -284,7 +285,6 @@ export declare class SalesService {
         sellerGstin: string;
         buyerGstin: string | null;
         issuedAt: Date;
-        financialYear: string;
     }>;
     findWebsiteOrderShortfalls(): Promise<{
         orderId: string;

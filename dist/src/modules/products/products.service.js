@@ -76,7 +76,6 @@ let ProductsService = class ProductsService {
             data: { isDeleted: true, isActive: false },
         });
     }
-<<<<<<< HEAD
     toStoreProduct(product, stock) {
         const slug = product.name
             .toLowerCase()
@@ -96,15 +95,12 @@ let ProductsService = class ProductsService {
             inStock: stock >= 1,
         };
     }
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     async findStoreCatalog() {
         const products = await this.prisma.product.findMany({
             where: { isDeleted: false, isActive: true },
             include: { category: true, unit: true },
             orderBy: { name: 'asc' },
         });
-<<<<<<< HEAD
         return Promise.all(products.map(async (product) => {
             const stock = await (0, gst_util_1.getProductStock)(this.prisma, product.id);
             return this.toStoreProduct(product, stock);
@@ -117,40 +113,12 @@ let ProductsService = class ProductsService {
                 isActive: true,
                 OR: [{ id }, { name: { equals: id, mode: 'insensitive' } }],
             },
-=======
-        return Promise.all(products.map((p) => this.toStoreProduct(p)));
-    }
-    async findStoreProduct(id) {
-        const product = await this.prisma.product.findFirst({
-            where: { id, isDeleted: false, isActive: true },
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
             include: { category: true, unit: true },
         });
         if (!product)
             return null;
-<<<<<<< HEAD
         const stock = await (0, gst_util_1.getProductStock)(this.prisma, product.id);
         return this.toStoreProduct(product, stock);
-=======
-        return this.toStoreProduct(product);
-    }
-    async toStoreProduct(p) {
-        const stock = await (0, gst_util_1.getProductStock)(this.prisma, p.id);
-        return {
-            id: p.id,
-            slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-            name: p.name,
-            category: p.category.name,
-            unit: p.unit.symbol,
-            unitName: p.unit.name,
-            price: Number(p.price),
-            hsnCode: p.hsnCode,
-            gstRate: Number(p.gstRate),
-            imageUrl: p.imageUrl,
-            inStock: stock > 0,
-            stock,
-        };
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     }
 };
 exports.ProductsService = ProductsService;

@@ -28,14 +28,9 @@ let StoreController = class StoreController {
     }
     async findProduct(id) {
         const product = await this.productsService.findStoreProduct(id);
-<<<<<<< HEAD
         if (!product) {
             throw new common_1.NotFoundException('Product not found');
         }
-=======
-        if (!product)
-            throw new common_1.NotFoundException('Product not found');
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
         return product;
     }
     register(dto) {
@@ -44,7 +39,6 @@ let StoreController = class StoreController {
     login(dto) {
         return this.storeService.login(dto);
     }
-<<<<<<< HEAD
     resetPassword(dto) {
         return this.storeService.resetPassword(dto);
     }
@@ -54,26 +48,18 @@ let StoreController = class StoreController {
     updateProfile(req, dto) {
         return this.storeService.updateProfile(req.user.sub, dto);
     }
-=======
-    me(req) {
-        return this.storeService.getProfile(req.user.sub);
-    }
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     placeOrder(req, dto) {
         return this.storeService.placeOrder(req.user.customerId, dto);
     }
     getOrders(req) {
         return this.storeService.getOrders(req.user.customerId);
     }
-<<<<<<< HEAD
     cancelOrder(req, id) {
         return this.storeService.cancelOrder(req.user.customerId, id);
     }
     submitContact(dto) {
         return this.storeService.submitContact(dto);
     }
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     getInvoicePdf(req, id, res) {
         return this.storeService.getInvoicePdf(req.user.customerId, id, res);
     }
@@ -120,7 +106,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], StoreController.prototype, "login", null);
 __decorate([
-<<<<<<< HEAD
     (0, common_1.Post)('auth/reset-password'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -128,8 +113,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], StoreController.prototype, "resetPassword", null);
 __decorate([
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     (0, common_1.Get)('auth/me'),
     (0, common_1.UseGuards)(foundation_auth_guard_1.FoundationAuthGuard),
     __param(0, (0, common_1.Req)()),
@@ -138,7 +121,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], StoreController.prototype, "me", null);
 __decorate([
-<<<<<<< HEAD
     (0, common_1.Patch)('auth/profile'),
     (0, common_1.UseGuards)(foundation_auth_guard_1.FoundationAuthGuard),
     __param(0, (0, common_1.Req)()),
@@ -148,8 +130,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], StoreController.prototype, "updateProfile", null);
 __decorate([
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     (0, common_1.Post)('orders'),
     (0, common_1.UseGuards)(foundation_auth_guard_1.FoundationAuthGuard),
     __param(0, (0, common_1.Req)()),
@@ -167,7 +147,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], StoreController.prototype, "getOrders", null);
 __decorate([
-<<<<<<< HEAD
     (0, common_1.Post)('orders/:id/cancel'),
     (0, common_1.UseGuards)(foundation_auth_guard_1.FoundationAuthGuard),
     __param(0, (0, common_1.Req)()),
@@ -184,8 +163,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], StoreController.prototype, "submitContact", null);
 __decorate([
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     (0, common_1.Get)('invoices/:id/pdf'),
     (0, common_1.UseGuards)(foundation_auth_guard_1.FoundationAuthGuard),
     __param(0, (0, common_1.Req)()),

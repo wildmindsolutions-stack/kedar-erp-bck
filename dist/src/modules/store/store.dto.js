@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-<<<<<<< HEAD
 exports.StoreContactDto = exports.StoreUpdateProfileDto = exports.StorePlaceOrderDto = exports.StoreRegisterDto = exports.StoreResetPasswordDto = exports.StoreLoginDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
@@ -41,20 +40,11 @@ __decorate([
     (0, class_validator_1.MinLength)(6),
     __metadata("design:type", String)
 ], StoreResetPasswordDto.prototype, "password", void 0);
-=======
-exports.StorePlaceOrderDto = exports.StoreOrderItemDto = exports.StoreLoginDto = exports.StoreRegisterDto = void 0;
-const class_validator_1 = require("class-validator");
-const class_transformer_1 = require("class-transformer");
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 class StoreRegisterDto {
 }
 exports.StoreRegisterDto = StoreRegisterDto;
 __decorate([
     (0, class_validator_1.IsString)(),
-<<<<<<< HEAD
-=======
-    (0, class_validator_1.IsNotEmpty)(),
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     __metadata("design:type", String)
 ], StoreRegisterDto.prototype, "name", void 0);
 __decorate([
@@ -68,10 +58,6 @@ __decorate([
 ], StoreRegisterDto.prototype, "password", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-<<<<<<< HEAD
-=======
-    (0, class_validator_1.IsNotEmpty)(),
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     __metadata("design:type", String)
 ], StoreRegisterDto.prototype, "phone", void 0);
 __decorate([
@@ -84,31 +70,10 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], StoreRegisterDto.prototype, "state", void 0);
-<<<<<<< HEAD
 class StoreOrderItemDto {
 }
 __decorate([
     (0, class_validator_1.IsString)(),
-=======
-class StoreLoginDto {
-}
-exports.StoreLoginDto = StoreLoginDto;
-__decorate([
-    (0, class_validator_1.IsEmail)(),
-    __metadata("design:type", String)
-], StoreLoginDto.prototype, "email", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6),
-    __metadata("design:type", String)
-], StoreLoginDto.prototype, "password", void 0);
-class StoreOrderItemDto {
-}
-exports.StoreOrderItemDto = StoreOrderItemDto;
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
     __metadata("design:type", String)
 ], StoreOrderItemDto.prototype, "productId", void 0);
 __decorate([
@@ -133,7 +98,6 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], StorePlaceOrderDto.prototype, "notes", void 0);
-<<<<<<< HEAD
 class StoreUpdateProfileDto {
 }
 exports.StoreUpdateProfileDto = StoreUpdateProfileDto;
@@ -171,6 +135,4 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], StoreContactDto.prototype, "message", void 0);
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 //# sourceMappingURL=store.dto.js.map
