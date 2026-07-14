@@ -13,10 +13,13 @@ exports.DeliveryService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const notifications_service_1 = require("../notifications/notifications.service");
+const customer_notifications_service_1 = require("../customer-notifications/customer-notifications.service");
+const store_util_1 = require("../../common/utils/store.util");
 let DeliveryService = class DeliveryService {
-    constructor(prisma, notifications) {
+    constructor(prisma, notifications, customerNotifications) {
         this.prisma = prisma;
         this.notifications = notifications;
+        this.customerNotifications = customerNotifications;
     }
     async getAvailableInvoices() {
         return this.prisma.invoice.findMany({
@@ -90,6 +93,14 @@ let DeliveryService = class DeliveryService {
             link: '/delivery',
             actorId: data.actorId,
         });
+        if ((0, store_util_1.isWebsiteOrder)(delivery.invoice.order.notes)) {
+            await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
+                type: 'ORDER_DISPATCHED',
+                title: 'Order Dispatched',
+                message: `Your order has been dispatched. Challan ${delivery.challanNo}.`,
+                refId: delivery.invoice.orderId,
+            });
+        }
         return delivery;
     }
     async markDelivered(id, actorId) {
@@ -107,6 +118,14 @@ let DeliveryService = class DeliveryService {
             link: '/delivery',
             actorId,
         });
+        if ((0, store_util_1.isWebsiteOrder)(delivery.invoice.order.notes)) {
+            await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
+                type: 'ORDER_DELIVERED',
+                title: 'Order Delivered',
+                message: 'Your order has been delivered. Thank you for shopping with Kedar Foundation.',
+                refId: delivery.invoice.orderId,
+            });
+        }
         return delivery;
     }
 };
@@ -114,6 +133,7 @@ exports.DeliveryService = DeliveryService;
 exports.DeliveryService = DeliveryService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        notifications_service_1.NotificationsService])
+        notifications_service_1.NotificationsService,
+        customer_notifications_service_1.CustomerNotificationsService])
 ], DeliveryService);
 //# sourceMappingURL=delivery.service.js.map

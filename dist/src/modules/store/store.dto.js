@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StorePlaceOrderDto = exports.StoreRegisterDto = exports.StoreLoginDto = void 0;
+exports.StoreContactDto = exports.StoreUpdateProfileDto = exports.StorePlaceOrderDto = exports.StoreRegisterDto = exports.StoreResetPasswordDto = exports.StoreLoginDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 class StoreLoginDto {
@@ -24,6 +24,22 @@ __decorate([
     (0, class_validator_1.MinLength)(6),
     __metadata("design:type", String)
 ], StoreLoginDto.prototype, "password", void 0);
+class StoreResetPasswordDto {
+}
+exports.StoreResetPasswordDto = StoreResetPasswordDto;
+__decorate([
+    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], StoreResetPasswordDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], StoreResetPasswordDto.prototype, "phone", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(6),
+    __metadata("design:type", String)
+], StoreResetPasswordDto.prototype, "password", void 0);
 class StoreRegisterDto {
 }
 exports.StoreRegisterDto = StoreRegisterDto;
@@ -82,4 +98,41 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], StorePlaceOrderDto.prototype, "notes", void 0);
+class StoreUpdateProfileDto {
+}
+exports.StoreUpdateProfileDto = StoreUpdateProfileDto;
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], StoreUpdateProfileDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], StoreUpdateProfileDto.prototype, "city", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], StoreUpdateProfileDto.prototype, "state", void 0);
+class StoreContactDto {
+}
+exports.StoreContactDto = StoreContactDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], StoreContactDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], StoreContactDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], StoreContactDto.prototype, "subject", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], StoreContactDto.prototype, "message", void 0);
 //# sourceMappingURL=store.dto.js.map

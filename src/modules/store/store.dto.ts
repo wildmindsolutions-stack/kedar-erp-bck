@@ -12,6 +12,18 @@ export class StoreLoginDto {
   password: string;
 }
 
+export class StoreResetPasswordDto {
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  phone: string;
+
+  @IsString()
+  @MinLength(6)
+  password: string;
+}
+
 export class StoreRegisterDto {
   @IsString()
   name: string;
@@ -55,4 +67,32 @@ export class StorePlaceOrderDto {
   @IsOptional()
   @IsString()
   notes?: string;
+}
+
+export class StoreUpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  state?: string;
+}
+
+export class StoreContactDto {
+  @IsString()
+  name: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  subject: string;
+
+  @IsString()
+  message: string;
 }

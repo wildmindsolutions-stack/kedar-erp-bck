@@ -11,6 +11,8 @@ import {
 import PDFKit = require('pdfkit');
 import { Response } from 'express';
 import { NotificationsService } from '../notifications/notifications.service';
+import { CustomerNotificationsService } from '../customer-notifications/customer-notifications.service';
+import { isWebsiteOrder, parseAwaitingStockNotes } from '../../common/utils/store.util';
 
 @Injectable()
 export class SalesService {
@@ -18,6 +20,7 @@ export class SalesService {
     private prisma: PrismaService,
     private config: ConfigService,
     private notifications: NotificationsService,
+    private customerNotifications: CustomerNotificationsService,
   ) {}
 
   findAll() {
@@ -77,15 +80,17 @@ export class SalesService {
       ? await this.prisma.user.findUnique({ where: { id: data.createdBy } })
       : null;
 
-    await this.notifications.notifyByModule({
-      module: 'sales',
-      type: 'ORDER_CREATED',
-      title: 'New Sales Order',
-      message: `${actor?.name || 'Sales'} created a draft order for ${order.customer.name}`,
-      refId: order.id,
-      link: '/sales',
-      actorId: data.createdBy,
-    });
+    if (!isWebsiteOrder(data.notes)) {
+      await this.notifications.notifyByModule({
+        module: 'sales',
+        type: 'ORDER_CREATED',
+        title: 'New Sales Order',
+        message: `${actor?.name || 'A team member'} created a draft order for ${order.customer.name}`,
+        refId: order.id,
+        link: `/sales?highlight=${order.id}`,
+        actorId: data.createdBy,
+      });
+    }
 
     return order;
   }
@@ -290,7 +295,39 @@ export class SalesService {
       actorId: userId,
     });
 
+    if (isWebsiteOrder(invoice.order.notes)) {
+      await this.customerNotifications.notifyCustomer(invoice.order.customerId, {
+        type: 'ORDER_CONFIRMED',
+        title: 'Order Confirmed',
+        message: `Your order has been confirmed. Invoice ${invoice.invoiceNo} has been generated.`,
+        refId: invoice.orderId,
+      });
+    }
+
     return invoice;
+  }
+
+  async findWebsiteOrderShortfalls() {
+    const orders = await this.prisma.salesOrder.findMany({
+      where: {
+        status: 'DRAFT',
+        notes: { contains: 'AWAITING_STOCK' },
+      },
+      include: {
+        customer: { select: { name: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return orders
+      .filter((order) => isWebsiteOrder(order.notes))
+      .map((order) => ({
+        orderId: order.id,
+        customerName: order.customer.name,
+        orderDate: order.orderDate,
+        shortfalls: parseAwaitingStockNotes(order.notes),
+      }))
+      .filter((entry) => entry.shortfalls.length > 0);
   }
 
   async cancelOrder(orderId: string) {
@@ -299,10 +336,21 @@ export class SalesService {
     if (order.status === 'CONFIRMED') {
       throw new BadRequestException('Cannot cancel confirmed order');
     }
-    return this.prisma.salesOrder.update({
+    const updated = await this.prisma.salesOrder.update({
       where: { id: orderId },
       data: { status: 'CANCELLED' },
     });
+
+    if (isWebsiteOrder(order.notes)) {
+      await this.customerNotifications.notifyCustomer(order.customerId, {
+        type: 'ORDER_CANCELLED',
+        title: 'Order Cancelled',
+        message: 'Your order was cancelled. Contact us if you need help placing a new order.',
+        refId: order.id,
+      });
+    }
+
+    return updated;
   }
 
   async generateInvoicePdf(invoiceId: string, res: Response) {

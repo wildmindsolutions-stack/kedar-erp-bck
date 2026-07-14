@@ -13,6 +13,7 @@ export declare class NotificationsController {
     } & {
         id: string;
         createdAt: Date;
+        link: string | null;
         createdBy: string | null;
         refId: string | null;
         userId: string;
@@ -20,7 +21,6 @@ export declare class NotificationsController {
         module: string;
         title: string;
         message: string;
-        link: string | null;
         isRead: boolean;
     })[]>;
     getUnreadCount(user: JwtPayload): import(".prisma/client").Prisma.PrismaPromise<number>;

@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { InventoryService } from './inventory.service';
+import { SalesService } from '../sales/sales.service';
 import { CurrentUser, JwtPayload } from '../../common/decorators/current-user.decorator';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { RequirePermission } from '../../common/decorators/require-permission.decorator';
@@ -9,7 +10,10 @@ import { PERMISSIONS } from '../../common/permissions';
 @Controller('inventory')
 @UseGuards(AuthGuard('jwt'), PermissionsGuard)
 export class InventoryController {
-  constructor(private inventoryService: InventoryService) {}
+  constructor(
+    private inventoryService: InventoryService,
+    private salesService: SalesService,
+  ) {}
 
   @Get()
   @RequirePermission(PERMISSIONS.INVENTORY_READ)
@@ -27,6 +31,12 @@ export class InventoryController {
   @RequirePermission(PERMISSIONS.INVENTORY_READ)
   getLowStockAlerts() {
     return this.inventoryService.getLowStockAlerts();
+  }
+
+  @Get('website-shortfalls')
+  @RequirePermission(PERMISSIONS.INVENTORY_READ)
+  getWebsiteShortfalls() {
+    return this.salesService.findWebsiteOrderShortfalls();
   }
 
   @Post('adjust')

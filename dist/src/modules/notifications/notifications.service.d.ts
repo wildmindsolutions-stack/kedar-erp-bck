@@ -23,6 +23,7 @@ export declare class NotificationsService {
     } & {
         id: string;
         createdAt: Date;
+        link: string | null;
         createdBy: string | null;
         refId: string | null;
         userId: string;
@@ -30,7 +31,6 @@ export declare class NotificationsService {
         module: string;
         title: string;
         message: string;
-        link: string | null;
         isRead: boolean;
     })[]>;
     getUnreadCount(userId: string): import(".prisma/client").Prisma.PrismaPromise<number>;

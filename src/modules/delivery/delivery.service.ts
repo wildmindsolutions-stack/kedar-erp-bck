@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { CustomerNotificationsService } from '../customer-notifications/customer-notifications.service';
+import { isWebsiteOrder } from '../../common/utils/store.util';
 
 @Injectable()
 export class DeliveryService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
+    private customerNotifications: CustomerNotificationsService,
   ) {}
 
   async getAvailableInvoices() {
@@ -94,6 +97,15 @@ export class DeliveryService {
       actorId: data.actorId,
     });
 
+    if (isWebsiteOrder(delivery.invoice.order.notes)) {
+      await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
+        type: 'ORDER_DISPATCHED',
+        title: 'Order Dispatched',
+        message: `Your order has been dispatched. Challan ${delivery.challanNo}.`,
+        refId: delivery.invoice.orderId,
+      });
+    }
+
     return delivery;
   }
 
@@ -113,6 +125,15 @@ export class DeliveryService {
       link: '/delivery',
       actorId,
     });
+
+    if (isWebsiteOrder(delivery.invoice.order.notes)) {
+      await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
+        type: 'ORDER_DELIVERED',
+        title: 'Order Delivered',
+        message: 'Your order has been delivered. Thank you for shopping with Kedar Foundation.',
+        refId: delivery.invoice.orderId,
+      });
+    }
 
     return delivery;
   }

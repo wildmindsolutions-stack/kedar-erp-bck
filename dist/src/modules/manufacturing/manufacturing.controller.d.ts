@@ -1,8 +1,10 @@
 import { ManufacturingService } from './manufacturing.service';
+import { SalesService } from '../sales/sales.service';
 import { JwtPayload } from '../../common/decorators/current-user.decorator';
 export declare class ManufacturingController {
     private manufacturingService;
-    constructor(manufacturingService: ManufacturingService);
+    private salesService;
+    constructor(manufacturingService: ManufacturingService, salesService: SalesService);
     findAll(): import(".prisma/client").Prisma.PrismaPromise<({
         product: {
             unit: {
@@ -45,6 +47,12 @@ export declare class ManufacturingController {
         product: string;
         totalQty: number;
         batches: number;
+    }[]>;
+    getWebsiteShortfalls(): Promise<{
+        orderId: string;
+        customerName: string;
+        orderDate: Date;
+        shortfalls: import("../../common/utils/store.util").AwaitingStockLine[];
     }[]>;
     create(body: {
         productId: string;

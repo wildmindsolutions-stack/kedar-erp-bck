@@ -26,10 +26,10 @@ export declare class PaymentsService {
     } & {
         id: string;
         createdAt: Date;
+        customerId: string;
+        mode: import(".prisma/client").$Enums.PaymentMode;
         notes: string | null;
         createdBy: string | null;
-        mode: import(".prisma/client").$Enums.PaymentMode;
-        customerId: string;
         amount: import("@prisma/client/runtime/library").Decimal;
         reference: string | null;
         receivedAt: Date;
@@ -61,10 +61,10 @@ export declare class PaymentsService {
     } & {
         id: string;
         createdAt: Date;
+        customerId: string;
+        mode: import(".prisma/client").$Enums.PaymentMode;
         notes: string | null;
         createdBy: string | null;
-        mode: import(".prisma/client").$Enums.PaymentMode;
-        customerId: string;
         amount: import("@prisma/client/runtime/library").Decimal;
         reference: string | null;
         receivedAt: Date;

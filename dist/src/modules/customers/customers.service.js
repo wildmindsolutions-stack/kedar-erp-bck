@@ -22,12 +22,17 @@ let CustomersService = class CustomersService {
     async findAll() {
         const customers = await this.prisma.customer.findMany({
             where: { isDeleted: false },
+            include: {
+                foundationAccount: { select: { id: true, email: true, isActive: true } },
+            },
             orderBy: { name: 'asc' },
         });
         return Promise.all(customers.map(async (c) => ({
             ...c,
             creditLimit: Number(c.creditLimit),
             outstanding: await (0, gst_util_1.getCustomerOutstanding)(this.prisma, c.id),
+            hasPortalAccount: Boolean(c.foundationAccount?.isActive),
+            portalEmail: c.foundationAccount?.email ?? null,
         })));
     }
     async findOne(id) {

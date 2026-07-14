@@ -10,8 +10,8 @@ export declare class CustomerNotificationsService {
     constructor(prisma: PrismaService);
     notifyCustomer(customerId: string, payload: CustomerNotifyPayload): Promise<{
         id: string;
-        customerId: string;
         createdAt: Date;
+        customerId: string;
         refId: string | null;
         type: string;
         title: string;
@@ -20,8 +20,8 @@ export declare class CustomerNotificationsService {
     } | null>;
     getForCustomer(customerId: string, limit?: number): import(".prisma/client").Prisma.PrismaPromise<{
         id: string;
-        customerId: string;
         createdAt: Date;
+        customerId: string;
         refId: string | null;
         type: string;
         title: string;

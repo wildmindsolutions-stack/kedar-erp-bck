@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { StoreService } from './store.service';
 import { ProductsService } from '../products/products.service';
-import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto } from './store.dto';
+import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto, StoreResetPasswordDto, StoreUpdateProfileDto, StoreContactDto } from './store.dto';
 interface FoundationRequest {
     user: {
         sub: string;
@@ -25,7 +25,6 @@ export declare class StoreController {
         gstRate: number;
         imageUrl: string | null;
         inStock: boolean;
-        stock: number;
     }[]>;
     findProduct(id: string): Promise<{
         id: string;
@@ -39,7 +38,6 @@ export declare class StoreController {
         gstRate: number;
         imageUrl: string | null;
         inStock: boolean;
-        stock: number;
     }>;
     register(dto: StoreRegisterDto): Promise<{
         accessToken: string;
@@ -69,7 +67,20 @@ export declare class StoreController {
             type: "foundation";
         };
     }>;
+    resetPassword(dto: StoreResetPasswordDto): Promise<{
+        message: string;
+    }>;
     me(req: FoundationRequest): Promise<{
+        id: string;
+        customerId: string;
+        name: string;
+        email: string;
+        phone: string | null;
+        city: string | null;
+        state: string;
+        type: "foundation";
+    }>;
+    updateProfile(req: FoundationRequest, dto: StoreUpdateProfileDto): Promise<{
         id: string;
         customerId: string;
         name: string;
@@ -91,27 +102,26 @@ export declare class StoreController {
         }[];
         customer: {
             id: string;
-            email: string | null;
+            name: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
+            email: string | null;
+            isDeleted: boolean;
             gstin: string | null;
             phone: string | null;
             address: string | null;
             city: string | null;
             state: string;
             creditLimit: import("@prisma/client/runtime/library").Decimal;
-            isDeleted: boolean;
         };
         items: ({
             product: {
                 id: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
-                isDeleted: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -119,18 +129,19 @@ export declare class StoreController {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
         } & {
             id: string;
             productId: string;
+            orderId: string;
             qty: import("@prisma/client/runtime/library").Decimal;
             rate: import("@prisma/client/runtime/library").Decimal;
-            orderId: string;
         })[];
         id: string;
-        customerId: string;
         createdAt: Date;
         updatedAt: Date;
+        customerId: string;
         notes: string | null;
         createdBy: string | null;
         status: import(".prisma/client").$Enums.OrderStatus;
@@ -144,16 +155,15 @@ export declare class StoreController {
                 unit: {
                     symbol: string;
                     id: string;
-                    createdAt: Date;
                     name: string;
+                    createdAt: Date;
                 };
             } & {
                 id: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
-                isDeleted: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -161,6 +171,7 @@ export declare class StoreController {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
             id: string;
             productId: string;
@@ -199,11 +210,10 @@ export declare class StoreController {
                 lineTotal: number;
                 product: {
                     id: string;
+                    name: string;
                     isActive: boolean;
                     createdAt: Date;
                     updatedAt: Date;
-                    name: string;
-                    isDeleted: boolean;
                     categoryId: string;
                     unitId: string;
                     price: import("@prisma/client/runtime/library").Decimal;
@@ -211,6 +221,7 @@ export declare class StoreController {
                     gstRate: import("@prisma/client/runtime/library").Decimal;
                     imageUrl: string | null;
                     lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                    isDeleted: boolean;
                 };
                 id: string;
                 hsnCode: string;
@@ -219,19 +230,32 @@ export declare class StoreController {
             }[];
         } | null;
         id: string;
-        customerId: string;
         createdAt: Date;
         updatedAt: Date;
+        customerId: string;
         notes: string | null;
         createdBy: string | null;
         status: import(".prisma/client").$Enums.OrderStatus;
         orderDate: Date;
     }[]>;
+    cancelOrder(req: FoundationRequest, id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        customerId: string;
+        notes: string | null;
+        createdBy: string | null;
+        status: import(".prisma/client").$Enums.OrderStatus;
+        orderDate: Date;
+    }>;
+    submitContact(dto: StoreContactDto): Promise<{
+        message: string;
+    }>;
     getInvoicePdf(req: FoundationRequest, id: string, res: Response): Promise<void>;
     getNotifications(req: FoundationRequest): import(".prisma/client").Prisma.PrismaPromise<{
         id: string;
-        customerId: string;
         createdAt: Date;
+        customerId: string;
         refId: string | null;
         type: string;
         title: string;

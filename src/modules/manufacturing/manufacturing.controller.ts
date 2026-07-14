@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ManufacturingService } from './manufacturing.service';
+import { SalesService } from '../sales/sales.service';
 import { CurrentUser, JwtPayload } from '../../common/decorators/current-user.decorator';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { RequirePermission } from '../../common/decorators/require-permission.decorator';
@@ -9,7 +10,10 @@ import { PERMISSIONS } from '../../common/permissions';
 @Controller('manufacturing')
 @UseGuards(AuthGuard('jwt'), PermissionsGuard)
 export class ManufacturingController {
-  constructor(private manufacturingService: ManufacturingService) {}
+  constructor(
+    private manufacturingService: ManufacturingService,
+    private salesService: SalesService,
+  ) {}
 
   @Get()
   @RequirePermission(PERMISSIONS.MANUFACTURING_READ)
@@ -21,6 +25,12 @@ export class ManufacturingController {
   @RequirePermission(PERMISSIONS.MANUFACTURING_READ)
   getYieldReport() {
     return this.manufacturingService.getYieldReport();
+  }
+
+  @Get('website-shortfalls')
+  @RequirePermission(PERMISSIONS.MANUFACTURING_READ)
+  getWebsiteShortfalls() {
+    return this.salesService.findWebsiteOrderShortfalls();
   }
 
   @Post()

@@ -6,6 +6,13 @@ export declare class CustomersController {
     findAll(): Promise<{
         creditLimit: number;
         outstanding: number;
+        hasPortalAccount: boolean;
+        portalEmail: string | null;
+        foundationAccount: {
+            id: string;
+            isActive: boolean;
+            email: string;
+        } | null;
         id: string;
         name: string;
         isActive: boolean;
@@ -26,10 +33,10 @@ export declare class CustomersController {
             amount: number;
             id: string;
             createdAt: Date;
+            customerId: string;
             notes: string | null;
             refId: string | null;
             type: import(".prisma/client").$Enums.LedgerType;
-            customerId: string;
         }[];
         id: string;
         name: string;

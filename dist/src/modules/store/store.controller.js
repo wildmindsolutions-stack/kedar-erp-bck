@@ -39,14 +39,26 @@ let StoreController = class StoreController {
     login(dto) {
         return this.storeService.login(dto);
     }
+    resetPassword(dto) {
+        return this.storeService.resetPassword(dto);
+    }
     me(req) {
         return this.storeService.getProfile(req.user.sub);
+    }
+    updateProfile(req, dto) {
+        return this.storeService.updateProfile(req.user.sub, dto);
     }
     placeOrder(req, dto) {
         return this.storeService.placeOrder(req.user.customerId, dto);
     }
     getOrders(req) {
         return this.storeService.getOrders(req.user.customerId);
+    }
+    cancelOrder(req, id) {
+        return this.storeService.cancelOrder(req.user.customerId, id);
+    }
+    submitContact(dto) {
+        return this.storeService.submitContact(dto);
     }
     getInvoicePdf(req, id, res) {
         return this.storeService.getInvoicePdf(req.user.customerId, id, res);
@@ -94,6 +106,13 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], StoreController.prototype, "login", null);
 __decorate([
+    (0, common_1.Post)('auth/reset-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [store_dto_1.StoreResetPasswordDto]),
+    __metadata("design:returntype", void 0)
+], StoreController.prototype, "resetPassword", null);
+__decorate([
     (0, common_1.Get)('auth/me'),
     (0, common_1.UseGuards)(foundation_auth_guard_1.FoundationAuthGuard),
     __param(0, (0, common_1.Req)()),
@@ -101,6 +120,15 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], StoreController.prototype, "me", null);
+__decorate([
+    (0, common_1.Patch)('auth/profile'),
+    (0, common_1.UseGuards)(foundation_auth_guard_1.FoundationAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, store_dto_1.StoreUpdateProfileDto]),
+    __metadata("design:returntype", void 0)
+], StoreController.prototype, "updateProfile", null);
 __decorate([
     (0, common_1.Post)('orders'),
     (0, common_1.UseGuards)(foundation_auth_guard_1.FoundationAuthGuard),
@@ -118,6 +146,22 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], StoreController.prototype, "getOrders", null);
+__decorate([
+    (0, common_1.Post)('orders/:id/cancel'),
+    (0, common_1.UseGuards)(foundation_auth_guard_1.FoundationAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], StoreController.prototype, "cancelOrder", null);
+__decorate([
+    (0, common_1.Post)('contact'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [store_dto_1.StoreContactDto]),
+    __metadata("design:returntype", void 0)
+], StoreController.prototype, "submitContact", null);
 __decorate([
     (0, common_1.Get)('invoices/:id/pdf'),
     (0, common_1.UseGuards)(foundation_auth_guard_1.FoundationAuthGuard),

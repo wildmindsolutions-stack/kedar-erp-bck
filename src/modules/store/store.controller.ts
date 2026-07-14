@@ -4,7 +4,7 @@ import {
 import { Response } from 'express';
 import { StoreService } from './store.service';
 import { ProductsService } from '../products/products.service';
-import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto } from './store.dto';
+import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto, StoreResetPasswordDto, StoreUpdateProfileDto, StoreContactDto } from './store.dto';
 import { FoundationAuthGuard } from '../../common/guards/foundation-auth.guard';
 
 interface FoundationRequest {
@@ -46,10 +46,21 @@ export class StoreController {
     return this.storeService.login(dto);
   }
 
+  @Post('auth/reset-password')
+  resetPassword(@Body() dto: StoreResetPasswordDto) {
+    return this.storeService.resetPassword(dto);
+  }
+
   @Get('auth/me')
   @UseGuards(FoundationAuthGuard)
   me(@Req() req: FoundationRequest) {
     return this.storeService.getProfile(req.user.sub);
+  }
+
+  @Patch('auth/profile')
+  @UseGuards(FoundationAuthGuard)
+  updateProfile(@Req() req: FoundationRequest, @Body() dto: StoreUpdateProfileDto) {
+    return this.storeService.updateProfile(req.user.sub, dto);
   }
 
   @Post('orders')
@@ -62,6 +73,17 @@ export class StoreController {
   @UseGuards(FoundationAuthGuard)
   getOrders(@Req() req: FoundationRequest) {
     return this.storeService.getOrders(req.user.customerId);
+  }
+
+  @Post('orders/:id/cancel')
+  @UseGuards(FoundationAuthGuard)
+  cancelOrder(@Req() req: FoundationRequest, @Param('id') id: string) {
+    return this.storeService.cancelOrder(req.user.customerId, id);
+  }
+
+  @Post('contact')
+  submitContact(@Body() dto: StoreContactDto) {
+    return this.storeService.submitContact(dto);
   }
 
   @Get('invoices/:id/pdf')

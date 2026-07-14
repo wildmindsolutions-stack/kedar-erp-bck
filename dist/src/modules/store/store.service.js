@@ -19,6 +19,7 @@ const sales_service_1 = require("../sales/sales.service");
 const notifications_service_1 = require("../notifications/notifications.service");
 const customer_notifications_service_1 = require("../customer-notifications/customer-notifications.service");
 const gst_util_1 = require("../../common/utils/gst.util");
+const store_util_1 = require("../../common/utils/store.util");
 let StoreService = class StoreService {
     constructor(prisma, jwt, customersService, salesService, notifications, customerNotifications) {
         this.prisma = prisma;
@@ -148,6 +149,31 @@ let StoreService = class StoreService {
         const accessToken = this.signToken(account.id, email, account.customerId);
         return { accessToken, user: this.toProfile(account) };
     }
+    async resetPassword(dto) {
+        const email = dto.email.toLowerCase().trim();
+        const account = await this.prisma.foundationAccount.findUnique({
+            where: { email },
+            include: { customer: true },
+        });
+        const normalizedPhone = this.normalizePhone(dto.phone);
+        const customerPhone = account?.customer.phone
+            ? this.normalizePhone(account.customer.phone)
+            : '';
+        if (!account
+            || !account.isActive
+            || account.customer.isDeleted
+            || !account.customer.isActive
+            || normalizedPhone.length < 10
+            || customerPhone !== normalizedPhone) {
+            throw new common_1.BadRequestException('Email and phone number do not match our records. Please check your details or contact support.');
+        }
+        const passwordHash = await bcrypt.hash(dto.password, 10);
+        await this.prisma.foundationAccount.update({
+            where: { id: account.id },
+            data: { passwordHash, isActive: true },
+        });
+        return { message: 'Password updated successfully. You can now log in.' };
+    }
     async getProfile(accountId) {
         const account = await this.prisma.foundationAccount.findUnique({
             where: { id: accountId },
@@ -169,6 +195,7 @@ let StoreService = class StoreService {
             throw new common_1.UnauthorizedException('Customer account not found');
         }
         const stockChecks = [];
+        const validatedItems = [];
         for (const item of dto.items) {
             const product = await this.prisma.product.findFirst({
                 where: { id: item.productId, isDeleted: false, isActive: true },
@@ -182,9 +209,6 @@ let StoreService = class StoreService {
             if (ordered < 1) {
                 throw new common_1.BadRequestException(`Invalid quantity for ${product.name}`);
             }
-            if (available < 1 && ordered > 0) {
-                throw new common_1.BadRequestException(`${product.name} is out of stock.`);
-            }
             const shortfall = Math.max(0, ordered - available);
             stockChecks.push({
                 productId: product.id,
@@ -193,6 +217,11 @@ let StoreService = class StoreService {
                 ordered,
                 available,
                 shortfall,
+            });
+            validatedItems.push({
+                productId: product.id,
+                qty: ordered,
+                rate: Number(product.price),
             });
         }
         const awaitingStock = stockChecks.filter((s) => s.shortfall > 0);
@@ -205,22 +234,18 @@ let StoreService = class StoreService {
         const order = await this.salesService.createOrder({
             customerId,
             orderDate,
-            items: dto.items.map((i) => ({
-                productId: i.productId,
-                qty: Number(i.qty),
-                rate: Number(i.rate),
-            })),
+            items: validatedItems,
             notes,
         });
         await this.notifications.notifyByModule({
-            module: 'payments',
+            module: 'sales',
             type: 'WEBSITE_ORDER_RECEIVED',
             title: 'New Website Order',
             message: awaitingStock.length
                 ? `Draft order from ${customer.name} — awaiting stock before confirmation`
                 : `Draft order from ${customer.name} — review in Sales & Billing`,
             refId: order.id,
-            link: '/sales',
+            link: `/sales?highlight=${order.id}`,
         });
         if (awaitingStock.length) {
             for (const s of awaitingStock) {
@@ -230,7 +255,7 @@ let StoreService = class StoreService {
                     title: 'Production Required for Website Order',
                     message: `${customer.name} ordered ${s.ordered} ${s.unit} of ${s.productName}. Only ${s.available} ${s.unit} in stock — produce ${s.shortfall} ${s.unit} before order can be confirmed.`,
                     refId: order.id,
-                    link: '/manufacturing',
+                    link: `/manufacturing?order=${order.id}`,
                 });
                 await this.notifications.notifyByModule({
                     module: 'inventory',
@@ -238,7 +263,7 @@ let StoreService = class StoreService {
                     title: 'Stock Shortfall on Website Order',
                     message: `${s.productName}: ${s.available} ${s.unit} available, ${s.ordered} ${s.unit} ordered. Reserve existing stock and plan replenishment.`,
                     refId: order.id,
-                    link: '/inventory',
+                    link: `/inventory?order=${order.id}`,
                 });
             }
             await this.customerNotifications.notifyCustomer(customerId, {
@@ -331,6 +356,63 @@ let StoreService = class StoreService {
             throw new common_1.NotFoundException('Invoice not found');
         }
         return this.salesService.generateInvoicePdf(invoiceId, res);
+    }
+    async updateProfile(accountId, dto) {
+        const account = await this.prisma.foundationAccount.findUnique({
+            where: { id: accountId },
+            include: { customer: true },
+        });
+        if (!account || !account.isActive) {
+            throw new common_1.UnauthorizedException();
+        }
+        const data = {};
+        if (dto.name?.trim())
+            data.name = dto.name.trim();
+        if (dto.city !== undefined)
+            data.city = dto.city.trim() || null;
+        if (dto.state?.trim())
+            data.state = dto.state.trim();
+        if (!Object.keys(data).length) {
+            throw new common_1.BadRequestException('No profile fields to update');
+        }
+        const customer = await this.prisma.customer.update({
+            where: { id: account.customerId },
+            data,
+        });
+        return this.toProfile({ ...account, customer });
+    }
+    async cancelOrder(customerId, orderId) {
+        const order = await this.prisma.salesOrder.findFirst({
+            where: { id: orderId, customerId },
+        });
+        if (!order) {
+            throw new common_1.NotFoundException('Order not found');
+        }
+        if (order.status !== 'DRAFT') {
+            throw new common_1.BadRequestException('Only pending orders can be cancelled');
+        }
+        if (!(0, store_util_1.isWebsiteOrder)(order.notes)) {
+            throw new common_1.BadRequestException('This order cannot be cancelled online. Please contact support.');
+        }
+        return this.salesService.cancelOrder(orderId);
+    }
+    async submitContact(dto) {
+        const name = dto.name.trim();
+        const email = dto.email.toLowerCase().trim();
+        const subject = dto.subject.trim();
+        const message = dto.message.trim();
+        if (!name || !message) {
+            throw new common_1.BadRequestException('Name and message are required');
+        }
+        await this.notifications.notifyByModule({
+            module: 'customers',
+            type: 'CONTACT_FORM',
+            title: `Website contact: ${subject}`,
+            message: `${name} (${email}): ${message.slice(0, 500)}${message.length > 500 ? '…' : ''}`,
+            link: '/customers',
+            notifyAdmins: true,
+        });
+        return { message: 'Thank you for reaching out. Our team will get back to you shortly.' };
     }
 };
 exports.StoreService = StoreService;

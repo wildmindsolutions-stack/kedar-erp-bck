@@ -125,7 +125,6 @@ export class ProductsService {
       gstRate: Number(product.gstRate),
       imageUrl: product.imageUrl,
       inStock: stock >= 1,
-      stock,
     };
   }
 

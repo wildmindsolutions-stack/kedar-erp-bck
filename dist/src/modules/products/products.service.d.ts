@@ -9,38 +9,38 @@ export declare class ProductsService {
         gstRate: number;
         lowStockThreshold: number;
         stock: number;
-        category: {
-            id: string;
-            createdAt: Date;
-            name: string;
-        };
         unit: {
             symbol: string;
             id: string;
-            createdAt: Date;
             name: string;
+            createdAt: Date;
+        };
+        category: {
+            id: string;
+            name: string;
+            createdAt: Date;
         };
         id: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
-        isDeleted: boolean;
         categoryId: string;
         unitId: string;
         hsnCode: string;
         imageUrl: string | null;
+        isDeleted: boolean;
     }[]>;
     findCategories(): import(".prisma/client").Prisma.PrismaPromise<{
         id: string;
-        createdAt: Date;
         name: string;
+        createdAt: Date;
     }[]>;
     findUnits(): import(".prisma/client").Prisma.PrismaPromise<{
         symbol: string;
         id: string;
-        createdAt: Date;
         name: string;
+        createdAt: Date;
     }[]>;
     create(data: {
         name: string;
@@ -52,24 +52,23 @@ export declare class ProductsService {
         lowStockThreshold?: number;
         createdBy?: string;
     }): Promise<{
-        category: {
-            id: string;
-            createdAt: Date;
-            name: string;
-        };
         unit: {
             symbol: string;
             id: string;
-            createdAt: Date;
             name: string;
+            createdAt: Date;
+        };
+        category: {
+            id: string;
+            name: string;
+            createdAt: Date;
         };
     } & {
         id: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
-        isDeleted: boolean;
         categoryId: string;
         unitId: string;
         price: import("@prisma/client/runtime/library").Decimal;
@@ -77,6 +76,7 @@ export declare class ProductsService {
         gstRate: import("@prisma/client/runtime/library").Decimal;
         imageUrl: string | null;
         lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+        isDeleted: boolean;
     }>;
     update(id: string, data: Partial<{
         name: string;
@@ -88,24 +88,23 @@ export declare class ProductsService {
         lowStockThreshold: number;
         isActive: boolean;
     }>): Promise<{
-        category: {
-            id: string;
-            createdAt: Date;
-            name: string;
-        };
         unit: {
             symbol: string;
             id: string;
-            createdAt: Date;
             name: string;
+            createdAt: Date;
+        };
+        category: {
+            id: string;
+            name: string;
+            createdAt: Date;
         };
     } & {
         id: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
-        isDeleted: boolean;
         categoryId: string;
         unitId: string;
         price: import("@prisma/client/runtime/library").Decimal;
@@ -113,14 +112,14 @@ export declare class ProductsService {
         gstRate: import("@prisma/client/runtime/library").Decimal;
         imageUrl: string | null;
         lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+        isDeleted: boolean;
     }>;
     remove(id: string): Promise<{
         id: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
-        isDeleted: boolean;
         categoryId: string;
         unitId: string;
         price: import("@prisma/client/runtime/library").Decimal;
@@ -128,6 +127,7 @@ export declare class ProductsService {
         gstRate: import("@prisma/client/runtime/library").Decimal;
         imageUrl: string | null;
         lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+        isDeleted: boolean;
     }>;
     private toStoreProduct;
     findStoreCatalog(): Promise<{
@@ -142,7 +142,6 @@ export declare class ProductsService {
         gstRate: number;
         imageUrl: string | null;
         inStock: boolean;
-        stock: number;
     }[]>;
     findStoreProduct(id: string): Promise<{
         id: string;
@@ -156,6 +155,5 @@ export declare class ProductsService {
         gstRate: number;
         imageUrl: string | null;
         inStock: boolean;
-        stock: number;
     } | null>;
 }

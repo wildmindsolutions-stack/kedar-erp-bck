@@ -7,46 +7,24 @@ export declare class SalesController {
     findOrders(): import(".prisma/client").Prisma.PrismaPromise<({
         customer: {
             id: string;
-            email: string | null;
+            name: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
+            email: string | null;
+            isDeleted: boolean;
             gstin: string | null;
             phone: string | null;
             address: string | null;
             city: string | null;
             state: string;
             creditLimit: import("@prisma/client/runtime/library").Decimal;
-            isDeleted: boolean;
         };
-        items: ({
-            product: {
-                id: string;
-                isActive: boolean;
-                createdAt: Date;
-                updatedAt: Date;
-                name: string;
-                isDeleted: boolean;
-                categoryId: string;
-                unitId: string;
-                price: import("@prisma/client/runtime/library").Decimal;
-                hsnCode: string;
-                gstRate: import("@prisma/client/runtime/library").Decimal;
-                imageUrl: string | null;
-                lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
-            };
-        } & {
-            id: string;
-            productId: string;
-            qty: import("@prisma/client/runtime/library").Decimal;
-            rate: import("@prisma/client/runtime/library").Decimal;
-            orderId: string;
-        })[];
         invoice: {
             id: string;
             createdAt: Date;
             isDeleted: boolean;
+            financialYear: string;
             status: import(".prisma/client").$Enums.InvoiceStatus;
             orderId: string;
             invoiceNo: string;
@@ -59,13 +37,35 @@ export declare class SalesController {
             sellerGstin: string;
             buyerGstin: string | null;
             issuedAt: Date;
-            financialYear: string;
         } | null;
+        items: ({
+            product: {
+                id: string;
+                name: string;
+                isActive: boolean;
+                createdAt: Date;
+                updatedAt: Date;
+                categoryId: string;
+                unitId: string;
+                price: import("@prisma/client/runtime/library").Decimal;
+                hsnCode: string;
+                gstRate: import("@prisma/client/runtime/library").Decimal;
+                imageUrl: string | null;
+                lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
+            };
+        } & {
+            id: string;
+            productId: string;
+            orderId: string;
+            qty: import("@prisma/client/runtime/library").Decimal;
+            rate: import("@prisma/client/runtime/library").Decimal;
+        })[];
     } & {
         id: string;
-        customerId: string;
         createdAt: Date;
         updatedAt: Date;
+        customerId: string;
         notes: string | null;
         createdBy: string | null;
         status: import(".prisma/client").$Enums.OrderStatus;
@@ -75,11 +75,10 @@ export declare class SalesController {
         items: ({
             product: {
                 id: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
-                isDeleted: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -87,6 +86,7 @@ export declare class SalesController {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
         } & {
             id: string;
@@ -95,34 +95,34 @@ export declare class SalesController {
             productId: string;
             qty: import("@prisma/client/runtime/library").Decimal;
             rate: import("@prisma/client/runtime/library").Decimal;
-            invoiceId: string;
             taxable: import("@prisma/client/runtime/library").Decimal;
             cgst: import("@prisma/client/runtime/library").Decimal;
             sgst: import("@prisma/client/runtime/library").Decimal;
             igst: import("@prisma/client/runtime/library").Decimal;
             lineTotal: import("@prisma/client/runtime/library").Decimal;
+            invoiceId: string;
         })[];
         order: {
             customer: {
                 id: string;
-                email: string | null;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
+                email: string | null;
+                isDeleted: boolean;
                 gstin: string | null;
                 phone: string | null;
                 address: string | null;
                 city: string | null;
                 state: string;
                 creditLimit: import("@prisma/client/runtime/library").Decimal;
-                isDeleted: boolean;
             };
         } & {
             id: string;
-            customerId: string;
             createdAt: Date;
             updatedAt: Date;
+            customerId: string;
             notes: string | null;
             createdBy: string | null;
             status: import(".prisma/client").$Enums.OrderStatus;
@@ -132,6 +132,7 @@ export declare class SalesController {
         id: string;
         createdAt: Date;
         isDeleted: boolean;
+        financialYear: string;
         status: import(".prisma/client").$Enums.InvoiceStatus;
         orderId: string;
         invoiceNo: string;
@@ -144,7 +145,6 @@ export declare class SalesController {
         sellerGstin: string;
         buyerGstin: string | null;
         issuedAt: Date;
-        financialYear: string;
     })[]>;
     createOrder(body: {
         customerId: string;
@@ -158,27 +158,26 @@ export declare class SalesController {
     }, user: JwtPayload): Promise<{
         customer: {
             id: string;
-            email: string | null;
+            name: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
+            email: string | null;
+            isDeleted: boolean;
             gstin: string | null;
             phone: string | null;
             address: string | null;
             city: string | null;
             state: string;
             creditLimit: import("@prisma/client/runtime/library").Decimal;
-            isDeleted: boolean;
         };
         items: ({
             product: {
                 id: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
-                isDeleted: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -186,19 +185,20 @@ export declare class SalesController {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
         } & {
             id: string;
             productId: string;
+            orderId: string;
             qty: import("@prisma/client/runtime/library").Decimal;
             rate: import("@prisma/client/runtime/library").Decimal;
-            orderId: string;
         })[];
     } & {
         id: string;
-        customerId: string;
         createdAt: Date;
         updatedAt: Date;
+        customerId: string;
         notes: string | null;
         createdBy: string | null;
         status: import(".prisma/client").$Enums.OrderStatus;
@@ -208,11 +208,10 @@ export declare class SalesController {
         items: ({
             product: {
                 id: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
-                isDeleted: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -220,6 +219,7 @@ export declare class SalesController {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
         } & {
             id: string;
@@ -228,34 +228,34 @@ export declare class SalesController {
             productId: string;
             qty: import("@prisma/client/runtime/library").Decimal;
             rate: import("@prisma/client/runtime/library").Decimal;
-            invoiceId: string;
             taxable: import("@prisma/client/runtime/library").Decimal;
             cgst: import("@prisma/client/runtime/library").Decimal;
             sgst: import("@prisma/client/runtime/library").Decimal;
             igst: import("@prisma/client/runtime/library").Decimal;
             lineTotal: import("@prisma/client/runtime/library").Decimal;
+            invoiceId: string;
         })[];
         order: {
             customer: {
                 id: string;
-                email: string | null;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
+                email: string | null;
+                isDeleted: boolean;
                 gstin: string | null;
                 phone: string | null;
                 address: string | null;
                 city: string | null;
                 state: string;
                 creditLimit: import("@prisma/client/runtime/library").Decimal;
-                isDeleted: boolean;
             };
         } & {
             id: string;
-            customerId: string;
             createdAt: Date;
             updatedAt: Date;
+            customerId: string;
             notes: string | null;
             createdBy: string | null;
             status: import(".prisma/client").$Enums.OrderStatus;
@@ -265,6 +265,7 @@ export declare class SalesController {
         id: string;
         createdAt: Date;
         isDeleted: boolean;
+        financialYear: string;
         status: import(".prisma/client").$Enums.InvoiceStatus;
         orderId: string;
         invoiceNo: string;
@@ -277,13 +278,12 @@ export declare class SalesController {
         sellerGstin: string;
         buyerGstin: string | null;
         issuedAt: Date;
-        financialYear: string;
     }>;
     cancelOrder(id: string): Promise<{
         id: string;
-        customerId: string;
         createdAt: Date;
         updatedAt: Date;
+        customerId: string;
         notes: string | null;
         createdBy: string | null;
         status: import(".prisma/client").$Enums.OrderStatus;

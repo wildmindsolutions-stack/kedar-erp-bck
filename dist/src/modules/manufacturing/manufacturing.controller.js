@@ -16,19 +16,24 @@ exports.ManufacturingController = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const manufacturing_service_1 = require("./manufacturing.service");
+const sales_service_1 = require("../sales/sales.service");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 const permissions_guard_1 = require("../../common/guards/permissions.guard");
 const require_permission_decorator_1 = require("../../common/decorators/require-permission.decorator");
 const permissions_1 = require("../../common/permissions");
 let ManufacturingController = class ManufacturingController {
-    constructor(manufacturingService) {
+    constructor(manufacturingService, salesService) {
         this.manufacturingService = manufacturingService;
+        this.salesService = salesService;
     }
     findAll() {
         return this.manufacturingService.findAll();
     }
     getYieldReport() {
         return this.manufacturingService.getYieldReport();
+    }
+    getWebsiteShortfalls() {
+        return this.salesService.findWebsiteOrderShortfalls();
     }
     create(body, user) {
         return this.manufacturingService.create({ ...body, createdBy: user.sub });
@@ -50,6 +55,13 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ManufacturingController.prototype, "getYieldReport", null);
 __decorate([
+    (0, common_1.Get)('website-shortfalls'),
+    (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.MANUFACTURING_READ),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], ManufacturingController.prototype, "getWebsiteShortfalls", null);
+__decorate([
     (0, common_1.Post)(),
     (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.MANUFACTURING_WRITE),
     __param(0, (0, common_1.Body)()),
@@ -61,6 +73,7 @@ __decorate([
 exports.ManufacturingController = ManufacturingController = __decorate([
     (0, common_1.Controller)('manufacturing'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), permissions_guard_1.PermissionsGuard),
-    __metadata("design:paramtypes", [manufacturing_service_1.ManufacturingService])
+    __metadata("design:paramtypes", [manufacturing_service_1.ManufacturingService,
+        sales_service_1.SalesService])
 ], ManufacturingController);
 //# sourceMappingURL=manufacturing.controller.js.map

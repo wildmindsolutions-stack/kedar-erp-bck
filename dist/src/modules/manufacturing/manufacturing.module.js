@@ -10,11 +10,13 @@ exports.ManufacturingModule = void 0;
 const common_1 = require("@nestjs/common");
 const manufacturing_service_1 = require("./manufacturing.service");
 const manufacturing_controller_1 = require("./manufacturing.controller");
+const sales_module_1 = require("../sales/sales.module");
 let ManufacturingModule = class ManufacturingModule {
 };
 exports.ManufacturingModule = ManufacturingModule;
 exports.ManufacturingModule = ManufacturingModule = __decorate([
     (0, common_1.Module)({
+        imports: [sales_module_1.SalesModule],
         controllers: [manufacturing_controller_1.ManufacturingController],
         providers: [manufacturing_service_1.ManufacturingService],
         exports: [manufacturing_service_1.ManufacturingService],

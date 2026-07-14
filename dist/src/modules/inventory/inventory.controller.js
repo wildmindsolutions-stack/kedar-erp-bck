@@ -16,13 +16,15 @@ exports.InventoryController = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const inventory_service_1 = require("./inventory.service");
+const sales_service_1 = require("../sales/sales.service");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 const permissions_guard_1 = require("../../common/guards/permissions.guard");
 const require_permission_decorator_1 = require("../../common/decorators/require-permission.decorator");
 const permissions_1 = require("../../common/permissions");
 let InventoryController = class InventoryController {
-    constructor(inventoryService) {
+    constructor(inventoryService, salesService) {
         this.inventoryService = inventoryService;
+        this.salesService = salesService;
     }
     getStockSummary() {
         return this.inventoryService.getStockSummary();
@@ -32,6 +34,9 @@ let InventoryController = class InventoryController {
     }
     getLowStockAlerts() {
         return this.inventoryService.getLowStockAlerts();
+    }
+    getWebsiteShortfalls() {
+        return this.salesService.findWebsiteOrderShortfalls();
     }
     adjust(body, user) {
         return this.inventoryService.adjust({ ...body, createdBy: user.sub });
@@ -64,6 +69,13 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "getLowStockAlerts", null);
 __decorate([
+    (0, common_1.Get)('website-shortfalls'),
+    (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.INVENTORY_READ),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], InventoryController.prototype, "getWebsiteShortfalls", null);
+__decorate([
     (0, common_1.Post)('adjust'),
     (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.INVENTORY_WRITE),
     __param(0, (0, common_1.Body)()),
@@ -84,6 +96,7 @@ __decorate([
 exports.InventoryController = InventoryController = __decorate([
     (0, common_1.Controller)('inventory'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), permissions_guard_1.PermissionsGuard),
-    __metadata("design:paramtypes", [inventory_service_1.InventoryService])
+    __metadata("design:paramtypes", [inventory_service_1.InventoryService,
+        sales_service_1.SalesService])
 ], InventoryController);
 //# sourceMappingURL=inventory.controller.js.map

@@ -1,8 +1,10 @@
 import { InventoryService } from './inventory.service';
+import { SalesService } from '../sales/sales.service';
 import { JwtPayload } from '../../common/decorators/current-user.decorator';
 export declare class InventoryController {
     private inventoryService;
-    constructor(inventoryService: InventoryService);
+    private salesService;
+    constructor(inventoryService: InventoryService, salesService: SalesService);
     getStockSummary(): Promise<{
         productId: string;
         productName: string;
@@ -46,6 +48,12 @@ export declare class InventoryController {
         stock: number;
         lowStockThreshold: number;
         isLowStock: boolean;
+    }[]>;
+    getWebsiteShortfalls(): Promise<{
+        orderId: string;
+        customerName: string;
+        orderDate: Date;
+        shortfalls: import("../../common/utils/store.util").AwaitingStockLine[];
     }[]>;
     adjust(body: {
         productId: string;

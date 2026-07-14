@@ -5,7 +5,7 @@ import { CustomersService } from '../customers/customers.service';
 import { SalesService } from '../sales/sales.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CustomerNotificationsService } from '../customer-notifications/customer-notifications.service';
-import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto } from './store.dto';
+import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto, StoreResetPasswordDto, StoreUpdateProfileDto, StoreContactDto } from './store.dto';
 export declare class StoreService {
     private prisma;
     private jwt;
@@ -46,6 +46,9 @@ export declare class StoreService {
             type: "foundation";
         };
     }>;
+    resetPassword(dto: StoreResetPasswordDto): Promise<{
+        message: string;
+    }>;
     getProfile(accountId: string): Promise<{
         id: string;
         customerId: string;
@@ -68,27 +71,26 @@ export declare class StoreService {
         }[];
         customer: {
             id: string;
-            email: string | null;
+            name: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
+            email: string | null;
+            isDeleted: boolean;
             gstin: string | null;
             phone: string | null;
             address: string | null;
             city: string | null;
             state: string;
             creditLimit: import("@prisma/client/runtime/library").Decimal;
-            isDeleted: boolean;
         };
         items: ({
             product: {
                 id: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
-                isDeleted: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -96,18 +98,19 @@ export declare class StoreService {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
         } & {
             id: string;
             productId: string;
+            orderId: string;
             qty: import("@prisma/client/runtime/library").Decimal;
             rate: import("@prisma/client/runtime/library").Decimal;
-            orderId: string;
         })[];
         id: string;
-        customerId: string;
         createdAt: Date;
         updatedAt: Date;
+        customerId: string;
         notes: string | null;
         createdBy: string | null;
         status: import(".prisma/client").$Enums.OrderStatus;
@@ -115,8 +118,8 @@ export declare class StoreService {
     }>;
     getNotifications(customerId: string): import(".prisma/client").Prisma.PrismaPromise<{
         id: string;
-        customerId: string;
         createdAt: Date;
+        customerId: string;
         refId: string | null;
         type: string;
         title: string;
@@ -134,16 +137,15 @@ export declare class StoreService {
                 unit: {
                     symbol: string;
                     id: string;
-                    createdAt: Date;
                     name: string;
+                    createdAt: Date;
                 };
             } & {
                 id: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
-                isDeleted: boolean;
                 categoryId: string;
                 unitId: string;
                 price: import("@prisma/client/runtime/library").Decimal;
@@ -151,6 +153,7 @@ export declare class StoreService {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
             id: string;
             productId: string;
@@ -189,11 +192,10 @@ export declare class StoreService {
                 lineTotal: number;
                 product: {
                     id: string;
+                    name: string;
                     isActive: boolean;
                     createdAt: Date;
                     updatedAt: Date;
-                    name: string;
-                    isDeleted: boolean;
                     categoryId: string;
                     unitId: string;
                     price: import("@prisma/client/runtime/library").Decimal;
@@ -201,6 +203,7 @@ export declare class StoreService {
                     gstRate: import("@prisma/client/runtime/library").Decimal;
                     imageUrl: string | null;
                     lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                    isDeleted: boolean;
                 };
                 id: string;
                 hsnCode: string;
@@ -209,13 +212,36 @@ export declare class StoreService {
             }[];
         } | null;
         id: string;
-        customerId: string;
         createdAt: Date;
         updatedAt: Date;
+        customerId: string;
         notes: string | null;
         createdBy: string | null;
         status: import(".prisma/client").$Enums.OrderStatus;
         orderDate: Date;
     }[]>;
     getInvoicePdf(customerId: string, invoiceId: string, res: Response): Promise<void>;
+    updateProfile(accountId: string, dto: StoreUpdateProfileDto): Promise<{
+        id: string;
+        customerId: string;
+        name: string;
+        email: string;
+        phone: string | null;
+        city: string | null;
+        state: string;
+        type: "foundation";
+    }>;
+    cancelOrder(customerId: string, orderId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        customerId: string;
+        notes: string | null;
+        createdBy: string | null;
+        status: import(".prisma/client").$Enums.OrderStatus;
+        orderDate: Date;
+    }>;
+    submitContact(dto: StoreContactDto): Promise<{
+        message: string;
+    }>;
 }
