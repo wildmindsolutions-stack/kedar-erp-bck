@@ -12,10 +12,7 @@ import PDFKit = require('pdfkit');
 import { Response } from 'express';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CustomerNotificationsService } from '../customer-notifications/customer-notifications.service';
-<<<<<<< HEAD
 import { isWebsiteOrder, parseAwaitingStockNotes } from '../../common/utils/store.util';
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 
 @Injectable()
 export class SalesService {
@@ -84,7 +81,6 @@ export class SalesService {
       ? await this.prisma.user.findUnique({ where: { id: data.createdBy } })
       : null;
 
-<<<<<<< HEAD
     if (!isWebsiteOrder(data.notes)) {
       await this.notifications.notifyByModule({
         module: 'sales',
@@ -96,18 +92,6 @@ export class SalesService {
         actorId: data.createdBy,
       });
     }
-=======
-    await this.notifications.notifyByModule({
-      module: 'sales',
-      type: 'ORDER_CREATED',
-      title: 'New Sales Order',
-      message: data.sourceMessage
-        || `${actor?.name || 'Sales'} created a draft order for ${order.customer.name}`,
-      refId: order.id,
-      link: '/sales',
-      actorId: data.createdBy,
-    });
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 
     return order;
   }
@@ -333,7 +317,6 @@ export class SalesService {
       actorId: userId,
     });
 
-<<<<<<< HEAD
     if (isWebsiteOrder(invoice.order.notes)) {
       await this.customerNotifications.notifyCustomer(invoice.order.customerId, {
         type: 'ORDER_CONFIRMED',
@@ -342,14 +325,6 @@ export class SalesService {
         refId: invoice.orderId,
       });
     }
-=======
-    await this.customerNotifications.notifyCustomer(invoice.order.customerId, {
-      type: 'ORDER_CONFIRMED',
-      title: 'Order Confirmed',
-      message: `Your order has been confirmed. Invoice ${invoice.invoiceNo} for ₹${Number(invoice.total).toLocaleString('en-IN')} has been generated.`,
-      refId: invoice.orderId,
-    });
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 
     return invoice;
   }
@@ -388,21 +363,12 @@ export class SalesService {
       data: { status: 'CANCELLED' },
     });
 
-<<<<<<< HEAD
     if (isWebsiteOrder(order.notes)) {
       await this.customerNotifications.notifyCustomer(order.customerId, {
         type: 'ORDER_CANCELLED',
         title: 'Order Cancelled',
         message: 'Your order was cancelled. Contact us if you need help placing a new order.',
         refId: order.id,
-=======
-    if (order.notes?.includes('Kedar Foundation')) {
-      await this.customerNotifications.notifyCustomer(order.customerId, {
-        type: 'ORDER_CANCELLED',
-        title: 'Order Cancelled',
-        message: 'Your order was cancelled. Please contact us if you need assistance.',
-        refId: orderId,
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
       });
     }
 

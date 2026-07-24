@@ -1,5 +1,4 @@
 import {
-<<<<<<< HEAD
   IsArray, IsEmail, IsNumber, IsOptional, IsString, MinLength, ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -27,15 +26,6 @@ export class StoreResetPasswordDto {
 
 export class StoreRegisterDto {
   @IsString()
-=======
-  IsArray, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength, ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-
-export class StoreRegisterDto {
-  @IsString()
-  @IsNotEmpty()
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
   name: string;
 
   @IsEmail()
@@ -46,10 +36,6 @@ export class StoreRegisterDto {
   password: string;
 
   @IsString()
-<<<<<<< HEAD
-=======
-  @IsNotEmpty()
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
   phone: string;
 
   @IsOptional()
@@ -61,23 +47,8 @@ export class StoreRegisterDto {
   state?: string;
 }
 
-<<<<<<< HEAD
 class StoreOrderItemDto {
   @IsString()
-=======
-export class StoreLoginDto {
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  @MinLength(6)
-  password: string;
-}
-
-export class StoreOrderItemDto {
-  @IsString()
-  @IsNotEmpty()
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
   productId: string;
 
   @IsNumber()
@@ -97,7 +68,6 @@ export class StorePlaceOrderDto {
   @IsString()
   notes?: string;
 }
-<<<<<<< HEAD
 
 export class StoreUpdateProfileDto {
   @IsOptional()
@@ -126,5 +96,3 @@ export class StoreContactDto {
   @IsString()
   message: string;
 }
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9

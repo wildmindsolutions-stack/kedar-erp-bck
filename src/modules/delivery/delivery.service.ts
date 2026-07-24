@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CustomerNotificationsService } from '../customer-notifications/customer-notifications.service';
-<<<<<<< HEAD
 import { isWebsiteOrder } from '../../common/utils/store.util';
-=======
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 
 @Injectable()
 export class DeliveryService {
@@ -100,7 +97,6 @@ export class DeliveryService {
       actorId: data.actorId,
     });
 
-<<<<<<< HEAD
     if (isWebsiteOrder(delivery.invoice.order.notes)) {
       await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
         type: 'ORDER_DISPATCHED',
@@ -109,15 +105,6 @@ export class DeliveryService {
         refId: delivery.invoice.orderId,
       });
     }
-=======
-    const vehicleInfo = delivery.vehicle ? ` Vehicle: ${delivery.vehicle}.` : '';
-    await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
-      type: 'ORDER_DISPATCHED',
-      title: 'Order Dispatched',
-      message: `Your order is on the way! Challan ${delivery.challanNo}.${vehicleInfo}`,
-      refId: delivery.invoice.orderId,
-    });
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 
     return delivery;
   }
@@ -139,7 +126,6 @@ export class DeliveryService {
       actorId,
     });
 
-<<<<<<< HEAD
     if (isWebsiteOrder(delivery.invoice.order.notes)) {
       await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
         type: 'ORDER_DELIVERED',
@@ -148,14 +134,6 @@ export class DeliveryService {
         refId: delivery.invoice.orderId,
       });
     }
-=======
-    await this.customerNotifications.notifyCustomer(delivery.invoice.order.customerId, {
-      type: 'ORDER_DELIVERED',
-      title: 'Order Delivered',
-      message: `Your order has been delivered successfully. Thank you for choosing Kedar Foundation!`,
-      refId: delivery.invoice.orderId,
-    });
->>>>>>> 21f639055a5d2dafd5ce9461fd916247f95309b9
 
     return delivery;
   }
