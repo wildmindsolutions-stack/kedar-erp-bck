@@ -26,9 +26,9 @@ export declare class PaymentsService {
     } & {
         id: string;
         createdAt: Date;
+        customerId: string;
         notes: string | null;
         createdBy: string | null;
-        customerId: string;
         amount: import("@prisma/client/runtime/library").Decimal;
         mode: import(".prisma/client").$Enums.PaymentMode;
         reference: string | null;
@@ -61,9 +61,9 @@ export declare class PaymentsService {
     } & {
         id: string;
         createdAt: Date;
+        customerId: string;
         notes: string | null;
         createdBy: string | null;
-        customerId: string;
         amount: import("@prisma/client/runtime/library").Decimal;
         mode: import(".prisma/client").$Enums.PaymentMode;
         reference: string | null;

@@ -69,24 +69,23 @@ export declare class StoreService {
         customer: {
             id: string;
             name: string;
+            isActive: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+            email: string | null;
+            isDeleted: boolean;
             gstin: string | null;
             phone: string | null;
-            email: string | null;
             address: string | null;
             city: string | null;
             state: string;
             creditLimit: import("@prisma/client/runtime/library").Decimal;
-            isActive: boolean;
-            isDeleted: boolean;
-            createdAt: Date;
-            updatedAt: Date;
         };
         items: ({
             product: {
                 id: string;
                 name: string;
                 isActive: boolean;
-                isDeleted: boolean;
                 createdAt: Date;
                 updatedAt: Date;
                 categoryId: string;
@@ -96,13 +95,14 @@ export declare class StoreService {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
         } & {
             id: string;
             productId: string;
+            orderId: string;
             qty: import("@prisma/client/runtime/library").Decimal;
             rate: import("@prisma/client/runtime/library").Decimal;
-            orderId: string;
         })[];
         id: string;
         createdAt: Date;
@@ -141,7 +141,6 @@ export declare class StoreService {
                 id: string;
                 name: string;
                 isActive: boolean;
-                isDeleted: boolean;
                 createdAt: Date;
                 updatedAt: Date;
                 categoryId: string;
@@ -151,6 +150,7 @@ export declare class StoreService {
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                isDeleted: boolean;
             };
             id: string;
             productId: string;
@@ -191,7 +191,6 @@ export declare class StoreService {
                     id: string;
                     name: string;
                     isActive: boolean;
-                    isDeleted: boolean;
                     createdAt: Date;
                     updatedAt: Date;
                     categoryId: string;
@@ -201,6 +200,7 @@ export declare class StoreService {
                     gstRate: import("@prisma/client/runtime/library").Decimal;
                     imageUrl: string | null;
                     lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
+                    isDeleted: boolean;
                 };
                 id: string;
                 hsnCode: string;

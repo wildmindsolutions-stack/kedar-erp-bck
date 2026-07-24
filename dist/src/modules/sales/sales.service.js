@@ -17,6 +17,7 @@ const gst_util_1 = require("../../common/utils/gst.util");
 const PDFKit = require("pdfkit");
 const notifications_service_1 = require("../notifications/notifications.service");
 const customer_notifications_service_1 = require("../customer-notifications/customer-notifications.service");
+const invoice_pdf_util_1 = require("../../common/utils/invoice-pdf.util");
 let SalesService = class SalesService {
     constructor(prisma, config, notifications, customerNotifications) {
         this.prisma = prisma;
@@ -306,60 +307,68 @@ let SalesService = class SalesService {
         const invoice = await this.prisma.invoice.findUnique({
             where: { id: invoiceId },
             include: {
-                items: { include: { product: true } },
+                items: { include: { product: { include: { unit: true } } } },
                 order: { include: { customer: true } },
             },
         });
         if (!invoice)
             throw new common_1.NotFoundException('Invoice not found');
         const companyName = this.config.get('COMPANY_NAME') || 'Kedar Enterprise';
-        const fmt = (n) => `Rs. ${n.toFixed(2)}`;
+        const companyState = this.config.get('COMPANY_STATE') || 'Gujarat';
+        const pdfData = {
+            invoiceNo: invoice.invoiceNo,
+            issuedAt: invoice.issuedAt,
+            sellerGstin: invoice.sellerGstin,
+            buyerGstin: invoice.buyerGstin || invoice.order.customer.gstin,
+            subtotal: Number(invoice.subtotal),
+            cgstAmount: Number(invoice.cgstAmount),
+            sgstAmount: Number(invoice.sgstAmount),
+            igstAmount: Number(invoice.igstAmount),
+            total: Number(invoice.total),
+            company: {
+                name: companyName,
+                tagline: this.config.get('COMPANY_TAGLINE') || 'Seva. Spirituality. Service',
+                address: this.config.get('COMPANY_ADDRESS')
+                    || '2-77, Gujarat Housing Board, Dehgam, PO: Dehgam, Dist: Gandhinagar, Gujarat, 382305',
+                phone: this.config.get('COMPANY_PHONE') || '+91 99094 32021  ·  +91 63519 25121',
+                email: this.config.get('COMPANY_EMAIL') || 'foundation.kedar@gmail.com',
+                website: this.config.get('COMPANY_WEBSITE') || 'kedarfoundation.com',
+                gstin: invoice.sellerGstin || this.config.get('COMPANY_GSTIN') || '',
+                state: companyState,
+                bankName: this.config.get('COMPANY_BANK_NAME') || '',
+                bankAccount: this.config.get('COMPANY_BANK_ACCOUNT') || '',
+                bankIfsc: this.config.get('COMPANY_BANK_IFSC') || '',
+                bankBranch: this.config.get('COMPANY_BANK_BRANCH') || '',
+                payeeName: this.config.get('COMPANY_PAYEE_NAME') || companyName,
+            },
+            customer: {
+                name: invoice.order.customer.name,
+                email: invoice.order.customer.email,
+                phone: invoice.order.customer.phone,
+                address: invoice.order.customer.address,
+                city: invoice.order.customer.city,
+                state: invoice.order.customer.state,
+                gstin: invoice.order.customer.gstin,
+            },
+            items: invoice.items.map((item) => ({
+                name: item.product.name,
+                hsnCode: item.hsnCode,
+                qty: Number(item.qty),
+                unit: item.product.unit?.symbol,
+                rate: Number(item.rate),
+                taxable: Number(item.taxable),
+                gstRate: Number(item.gstRate),
+                cgst: Number(item.cgst),
+                sgst: Number(item.sgst),
+                igst: Number(item.igst),
+                lineTotal: Number(item.lineTotal),
+            })),
+        };
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename="${invoice.invoiceNo.replace(/\//g, '-')}.pdf"`);
-        const doc = new PDFKit({ margin: 50, size: 'A4' });
+        const doc = new PDFKit({ margin: 0, size: 'A4' });
         doc.pipe(res);
-        doc.fontSize(20).text(companyName, { align: 'center' });
-        doc.fontSize(10).text('Tax Invoice', { align: 'center' });
-        doc.moveDown();
-        doc.fontSize(11).text(`Invoice No: ${invoice.invoiceNo}`);
-        doc.text(`Date: ${invoice.issuedAt.toLocaleDateString('en-IN')}`);
-        doc.text(`Seller GSTIN: ${invoice.sellerGstin}`);
-        doc.text(`Buyer: ${invoice.order.customer.name}`);
-        if (invoice.buyerGstin)
-            doc.text(`Buyer GSTIN: ${invoice.buyerGstin}`);
-        doc.moveDown();
-        const col = { product: 50, hsn: 200, qty: 270, rate: 320, taxable: 380, total: 460 };
-        doc.fontSize(10).font('Helvetica-Bold');
-        let rowY = doc.y;
-        doc.text('Product', col.product, rowY);
-        doc.text('HSN', col.hsn, rowY);
-        doc.text('Qty', col.qty, rowY);
-        doc.text('Rate', col.rate, rowY);
-        doc.text('Taxable', col.taxable, rowY);
-        doc.text('Total', col.total, rowY);
-        doc.font('Helvetica');
-        rowY = doc.y + 14;
-        doc.moveTo(50, rowY).lineTo(545, rowY).stroke();
-        rowY += 8;
-        for (const item of invoice.items) {
-            doc.text(item.product.name, col.product, rowY, { width: 140 });
-            doc.text(item.hsnCode, col.hsn, rowY);
-            doc.text(String(Number(item.qty)), col.qty, rowY);
-            doc.text(fmt(Number(item.rate)), col.rate, rowY);
-            doc.text(fmt(Number(item.taxable)), col.taxable, rowY);
-            doc.text(fmt(Number(item.lineTotal)), col.total, rowY);
-            rowY += 20;
-        }
-        doc.y = rowY + 10;
-        doc.text(`Subtotal: ${fmt(Number(invoice.subtotal))}`, { align: 'right' });
-        if (Number(invoice.cgstAmount) > 0) {
-            doc.text(`CGST: ${fmt(Number(invoice.cgstAmount))}`, { align: 'right' });
-            doc.text(`SGST: ${fmt(Number(invoice.sgstAmount))}`, { align: 'right' });
-        }
-        if (Number(invoice.igstAmount) > 0) {
-            doc.text(`IGST: ${fmt(Number(invoice.igstAmount))}`, { align: 'right' });
-        }
-        doc.fontSize(13).text(`Grand Total: ${fmt(Number(invoice.total))}`, { align: 'right' });
+        (0, invoice_pdf_util_1.drawInvoicePdf)(doc, pdfData);
         doc.end();
     }
 };
