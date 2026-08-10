@@ -31,6 +31,7 @@ async function main() {
     drawInvoicePdf(doc, {
       invoiceNo: invoice.invoiceNo,
       issuedAt: invoice.issuedAt,
+      withGst: invoice.withGst !== false,
       sellerGstin: invoice.sellerGstin,
       buyerGstin: invoice.buyerGstin || invoice.order.customer.gstin,
       subtotal: Number(invoice.subtotal),

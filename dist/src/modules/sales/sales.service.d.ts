@@ -33,6 +33,7 @@ export declare class SalesService {
             status: import(".prisma/client").$Enums.InvoiceStatus;
             orderId: string;
             invoiceNo: string;
+            withGst: boolean;
             subtotal: import("@prisma/client/runtime/library").Decimal;
             cgstAmount: import("@prisma/client/runtime/library").Decimal;
             sgstAmount: import("@prisma/client/runtime/library").Decimal;
@@ -141,6 +142,7 @@ export declare class SalesService {
         status: import(".prisma/client").$Enums.InvoiceStatus;
         orderId: string;
         invoiceNo: string;
+        withGst: boolean;
         subtotal: import("@prisma/client/runtime/library").Decimal;
         cgstAmount: import("@prisma/client/runtime/library").Decimal;
         sgstAmount: import("@prisma/client/runtime/library").Decimal;
@@ -211,7 +213,9 @@ export declare class SalesService {
         status: import(".prisma/client").$Enums.OrderStatus;
         orderDate: Date;
     }>;
-    confirmOrder(orderId: string, userId: string): Promise<{
+    confirmOrder(orderId: string, userId: string, options?: {
+        withGst?: boolean;
+    }): Promise<{
         items: ({
             product: {
                 id: string;
@@ -276,6 +280,7 @@ export declare class SalesService {
         status: import(".prisma/client").$Enums.InvoiceStatus;
         orderId: string;
         invoiceNo: string;
+        withGst: boolean;
         subtotal: import("@prisma/client/runtime/library").Decimal;
         cgstAmount: import("@prisma/client/runtime/library").Decimal;
         sgstAmount: import("@prisma/client/runtime/library").Decimal;

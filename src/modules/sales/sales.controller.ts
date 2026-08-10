@@ -40,11 +40,17 @@ export class SalesController {
 
   @Post('orders/:id/confirm')
   @RequirePermission(PERMISSIONS.SALES_WRITE)
-  confirmOrder(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+  confirmOrder(
+    @Param('id') id: string,
+    @Body() body: { withGst?: boolean },
+    @CurrentUser() user: JwtPayload,
+  ) {
     if (!canConfirmSalesOrders(user.role)) {
       throw new ForbiddenException('Only Accountant or Manager can confirm orders and generate invoices');
     }
-    return this.salesService.confirmOrder(id, user.sub);
+    return this.salesService.confirmOrder(id, user.sub, {
+      withGst: body?.withGst !== false,
+    });
   }
 
   @Post('orders/:id/cancel')

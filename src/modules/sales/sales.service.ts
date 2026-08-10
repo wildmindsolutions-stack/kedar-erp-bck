@@ -95,7 +95,8 @@ export class SalesService {
     return order;
   }
 
-  async confirmOrder(orderId: string, userId: string) {
+  async confirmOrder(orderId: string, userId: string, options?: { withGst?: boolean }) {
+    const withGst = options?.withGst !== false;
     const sellerState = this.config.get('COMPANY_STATE') || 'Maharashtra';
     const sellerGstin = this.config.get('COMPANY_GSTIN') || '';
 
@@ -187,10 +188,31 @@ export class SalesService {
       let igstTotal = 0;
 
       const invoiceItemsData = order.items.map((item) => {
+        const qty = Number(item.qty);
+        const rate = Number(item.rate);
+        const taxable = qty * rate;
+
+        // Without GST (parchi / trade bill): no tax lines, stock still deducted
+        if (!withGst) {
+          subtotal += taxable;
+          return {
+            productId: item.productId,
+            qty: item.qty,
+            rate: item.rate,
+            hsnCode: item.product.hsnCode,
+            gstRate: 0,
+            taxable,
+            cgst: 0,
+            sgst: 0,
+            igst: 0,
+            lineTotal: taxable,
+          };
+        }
+
         const gst = calculateGstLine(
           {
-            qty: Number(item.qty),
-            rate: Number(item.rate),
+            qty,
+            rate,
             gstRate: Number(item.product.gstRate),
           },
           interState,
@@ -220,14 +242,15 @@ export class SalesService {
         data: {
           orderId: order.id,
           invoiceNo,
+          withGst,
           subtotal,
           cgstAmount: cgstTotal,
           sgstAmount: sgstTotal,
           igstAmount: igstTotal,
           gstAmount,
           total,
-          sellerGstin,
-          buyerGstin: order.customer.gstin,
+          sellerGstin: withGst ? sellerGstin : '',
+          buyerGstin: withGst ? order.customer.gstin : null,
           issuedAt: new Date(),
           financialYear: fy,
           items: { create: invoiceItemsData },
@@ -253,7 +276,7 @@ export class SalesService {
           amount: total,
           type: 'DEBIT',
           refId: invoice.id,
-          notes: `Invoice ${invoiceNo}`,
+          notes: withGst ? `Tax Invoice ${invoiceNo}` : `Invoice ${invoiceNo} (without GST)`,
         },
       });
 
@@ -267,7 +290,7 @@ export class SalesService {
           userId,
           entity: 'sales_order',
           action: 'confirm',
-          after: { orderId, invoiceNo, total },
+          after: { orderId, invoiceNo, total, withGst },
         },
       });
 
@@ -275,12 +298,13 @@ export class SalesService {
     });
 
     const actor = await this.prisma.user.findUnique({ where: { id: userId } });
+    const invoiceLabel = withGst ? 'Tax Invoice' : 'Invoice (without GST)';
 
     await this.notifications.notifyByModule({
       module: 'sales',
       type: 'ORDER_CONFIRMED',
-      title: 'Invoice Generated',
-      message: `${actor?.name || 'User'} confirmed order — Invoice ${invoice.invoiceNo} for ₹${Number(invoice.total)} (${invoice.order.customer.name})`,
+      title: `${invoiceLabel} Generated`,
+      message: `${actor?.name || 'User'} confirmed order — ${invoiceLabel} ${invoice.invoiceNo} for ₹${Number(invoice.total)} (${invoice.order.customer.name})`,
       refId: invoice.id,
       link: '/sales',
       actorId: userId,
@@ -290,7 +314,7 @@ export class SalesService {
       module: 'payments',
       type: 'INVOICE_ISSUED',
       title: 'New Invoice — Payment Due',
-      message: `Invoice ${invoice.invoiceNo}: ₹${Number(invoice.total)} due from ${invoice.order.customer.name}`,
+      message: `${invoiceLabel} ${invoice.invoiceNo}: ₹${Number(invoice.total)} due from ${invoice.order.customer.name}`,
       refId: invoice.id,
       link: '/payments',
       actorId: userId,
@@ -319,7 +343,9 @@ export class SalesService {
     await this.customerNotifications.notifyCustomer(invoice.order.customerId, {
       type: 'ORDER_CONFIRMED',
       title: 'Order Confirmed',
-      message: `Your order has been confirmed. Invoice ${invoice.invoiceNo} for ₹${Number(invoice.total).toLocaleString('en-IN')} has been generated.`,
+      message: withGst
+        ? `Your order has been confirmed. Tax Invoice ${invoice.invoiceNo} for ₹${Number(invoice.total).toLocaleString('en-IN')} has been generated.`
+        : `Your order has been confirmed. Invoice ${invoice.invoiceNo} for ₹${Number(invoice.total).toLocaleString('en-IN')} has been generated.`,
       refId: invoice.orderId,
     });
 
@@ -365,6 +391,7 @@ export class SalesService {
     const pdfData: InvoicePdfData = {
       invoiceNo: invoice.invoiceNo,
       issuedAt: invoice.issuedAt,
+      withGst: invoice.withGst !== false,
       sellerGstin: invoice.sellerGstin,
       buyerGstin: invoice.buyerGstin || invoice.order.customer.gstin,
       subtotal: Number(invoice.subtotal),

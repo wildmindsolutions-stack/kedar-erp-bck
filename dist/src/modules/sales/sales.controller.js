@@ -33,11 +33,13 @@ let SalesController = class SalesController {
     createOrder(body, user) {
         return this.salesService.createOrder({ ...body, createdBy: user.sub });
     }
-    confirmOrder(id, user) {
+    confirmOrder(id, body, user) {
         if (!(0, permissions_1.canConfirmSalesOrders)(user.role)) {
             throw new common_1.ForbiddenException('Only Accountant or Manager can confirm orders and generate invoices');
         }
-        return this.salesService.confirmOrder(id, user.sub);
+        return this.salesService.confirmOrder(id, user.sub, {
+            withGst: body?.withGst !== false,
+        });
     }
     cancelOrder(id) {
         return this.salesService.cancelOrder(id);
@@ -74,9 +76,10 @@ __decorate([
     (0, common_1.Post)('orders/:id/confirm'),
     (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.SALES_WRITE),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "confirmOrder", null);
 __decorate([

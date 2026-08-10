@@ -142,6 +142,7 @@ export interface InvoicePdfItem {
 export interface InvoicePdfData {
   invoiceNo: string;
   issuedAt: Date;
+  withGst: boolean;
   sellerGstin: string;
   buyerGstin?: string | null;
   subtotal: number;
@@ -203,7 +204,9 @@ export function drawInvoicePdf(doc: PDFKit.PDFDocument, data: InvoicePdfData) {
 
   at(data.company.name.toUpperCase(), left + 58, y + 2, { bold: true, size: 16, color: NAVY, width: 240 });
   at(data.company.tagline || 'Seva. Spirituality. Service', left + 58, y + 22, { size: 8, color: GOLD, width: 240 });
-  at(`GSTIN: ${data.company.gstin}`, left + 58, y + 34, { size: 7, color: MUTED, width: 240 });
+  if (data.withGst && data.company.gstin) {
+    at(`GSTIN: ${data.company.gstin}`, left + 58, y + 34, { size: 7, color: MUTED, width: 240 });
+  }
 
   const contactW = contentW - 300;
   const contactX = left + 300;
@@ -222,7 +225,15 @@ export function drawInvoicePdf(doc: PDFKit.PDFDocument, data: InvoicePdfData) {
   doc.circle((left + right) / 2, y, 2.5).fill(GOLD);
 
   y += 10;
-  at('Tax Invoice', left, y, { bold: true, size: 14, color: NAVY, width: contentW, align: 'center' });
+  at(data.withGst ? 'Tax Invoice' : 'Invoice', left, y, {
+    bold: true, size: 14, color: NAVY, width: contentW, align: 'center',
+  });
+  if (!data.withGst) {
+    at('(Without GST)', left, y + 16, {
+      size: 8, color: MUTED, width: contentW, align: 'center',
+    });
+    y += 10;
+  }
 
   // ===== Bill To + Invoice Details =====
   y += 20;
@@ -250,11 +261,19 @@ export function drawInvoicePdf(doc: PDFKit.PDFDocument, data: InvoicePdfData) {
     at(line, leftBoxX + 8, by, { size: 7.5, color: '#333', width: halfW - 16, lineBreak: true, height: 12 });
     by += 11;
   }
-  const buyerGstin = data.buyerGstin || c.gstin || 'N.A.';
+  const buyerGstin = data.withGst
+    ? (data.buyerGstin || c.gstin || 'N.A.')
+    : 'N.A.';
   const stateCode = getStateCode(c.state || data.company.state);
-  at(`GSTIN: ${buyerGstin}  |  State Code: ${stateCode}`, leftBoxX + 8, y + boxH - 14, {
-    bold: true, size: 7.5, color: NAVY, width: halfW - 16,
-  });
+  if (data.withGst) {
+    at(`GSTIN: ${buyerGstin}  |  State Code: ${stateCode}`, leftBoxX + 8, y + boxH - 14, {
+      bold: true, size: 7.5, color: NAVY, width: halfW - 16,
+    });
+  } else {
+    at('Bill type: Without GST (Parchi / Trade)', leftBoxX + 8, y + boxH - 14, {
+      bold: true, size: 7.5, color: NAVY, width: halfW - 16,
+    });
+  }
 
   doc.roundedRect(rightBoxX, y, halfW, boxH, 3).strokeColor(LINE).lineWidth(0.8).stroke();
   doc.rect(rightBoxX, y, halfW, 16).fill(LIGHT_BLUE);
@@ -268,8 +287,12 @@ export function drawInvoicePdf(doc: PDFKit.PDFDocument, data: InvoicePdfData) {
     ['Invoice No.', data.invoiceNo, true],
     ['Invoice Date', invDate, true],
     ['Place of Supply', placeOfSupply, false],
-    ['Seller GSTIN', data.sellerGstin || data.company.gstin, false],
   ];
+  if (data.withGst) {
+    detailRows.push(['Seller GSTIN', data.sellerGstin || data.company.gstin, false]);
+  } else {
+    detailRows.push(['Bill Type', 'Without GST', false]);
+  }
 
   let dy = y + 24;
   for (const [label, value, highlight] of detailRows) {
@@ -355,11 +378,11 @@ export function drawInvoicePdf(doc: PDFKit.PDFDocument, data: InvoicePdfData) {
   };
 
   drawTotalRow('Total', formatInr(data.subtotal), { bold: true });
-  if (data.cgstAmount > 0) {
+  if (data.withGst && data.cgstAmount > 0) {
     drawTotalRow(`CGST@${halfRate.toFixed(0)}%`, formatInr(data.cgstAmount), { blue: true });
     drawTotalRow(`SGST@${halfRate.toFixed(0)}%`, formatInr(data.sgstAmount), { blue: true });
   }
-  if (data.igstAmount > 0) {
+  if (data.withGst && data.igstAmount > 0) {
     drawTotalRow(`IGST@${avgGst.toFixed(0)}%`, formatInr(data.igstAmount), { blue: true });
   }
 

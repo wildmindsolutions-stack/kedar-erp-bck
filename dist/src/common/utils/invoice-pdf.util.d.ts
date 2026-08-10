@@ -42,6 +42,7 @@ export interface InvoicePdfItem {
 export interface InvoicePdfData {
     invoiceNo: string;
     issuedAt: Date;
+    withGst: boolean;
     sellerGstin: string;
     buyerGstin?: string | null;
     subtotal: number;
