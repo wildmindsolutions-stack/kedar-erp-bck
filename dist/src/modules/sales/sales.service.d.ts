@@ -57,6 +57,9 @@ export declare class SalesService {
                 hsnCode: string;
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
+                description: string | null;
+                packSize: string | null;
+                prebookEnabled: boolean;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
                 isDeleted: boolean;
             };
@@ -91,6 +94,9 @@ export declare class SalesService {
                 hsnCode: string;
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
+                description: string | null;
+                packSize: string | null;
+                prebookEnabled: boolean;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
                 isDeleted: boolean;
             };
@@ -193,6 +199,9 @@ export declare class SalesService {
                 hsnCode: string;
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
+                description: string | null;
+                packSize: string | null;
+                prebookEnabled: boolean;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
                 isDeleted: boolean;
             };
@@ -215,6 +224,7 @@ export declare class SalesService {
     }>;
     confirmOrder(orderId: string, userId: string, options?: {
         withGst?: boolean;
+        taxInclusive?: boolean;
     }): Promise<{
         items: ({
             product: {
@@ -229,6 +239,9 @@ export declare class SalesService {
                 hsnCode: string;
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
+                description: string | null;
+                packSize: string | null;
+                prebookEnabled: boolean;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
                 isDeleted: boolean;
             };

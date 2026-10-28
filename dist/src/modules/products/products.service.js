@@ -49,6 +49,9 @@ let ProductsService = class ProductsService {
                 hsnCode: data.hsnCode,
                 gstRate: data.gstRate ?? 5,
                 lowStockThreshold: data.lowStockThreshold ?? 10,
+                description: data.description || null,
+                packSize: data.packSize || null,
+                prebookEnabled: data.prebookEnabled ?? false,
             },
             include: { category: true, unit: true },
         });

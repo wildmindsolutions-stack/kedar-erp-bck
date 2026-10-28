@@ -24,6 +24,7 @@ const dashboard_module_1 = require("./modules/dashboard/dashboard.module");
 const notifications_module_1 = require("./modules/notifications/notifications.module");
 const customer_notifications_module_1 = require("./modules/customer-notifications/customer-notifications.module");
 const store_module_1 = require("./modules/store/store.module");
+const prebooking_module_1 = require("./modules/prebooking/prebooking.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -45,6 +46,7 @@ exports.AppModule = AppModule = __decorate([
             delivery_module_1.DeliveryModule,
             dashboard_module_1.DashboardModule,
             store_module_1.StoreModule,
+            prebooking_module_1.PreBookingModule,
         ],
         controllers: [app_controller_1.AppController],
     })

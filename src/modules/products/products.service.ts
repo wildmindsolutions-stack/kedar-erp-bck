@@ -43,6 +43,9 @@ export class ProductsService {
     hsnCode: string;
     gstRate?: number;
     lowStockThreshold?: number;
+    description?: string;
+    packSize?: string;
+    prebookEnabled?: boolean;
     createdBy?: string;
   }) {
     const product = await this.prisma.product.create({
@@ -54,6 +57,9 @@ export class ProductsService {
         hsnCode: data.hsnCode,
         gstRate: data.gstRate ?? 5,
         lowStockThreshold: data.lowStockThreshold ?? 10,
+        description: data.description || null,
+        packSize: data.packSize || null,
+        prebookEnabled: data.prebookEnabled ?? false,
       },
       include: { category: true, unit: true },
     });
@@ -79,6 +85,9 @@ export class ProductsService {
     hsnCode: string;
     gstRate: number;
     lowStockThreshold: number;
+    description: string | null;
+    packSize: string | null;
+    prebookEnabled: boolean;
     isActive: boolean;
   }>) {
     return this.prisma.product.update({

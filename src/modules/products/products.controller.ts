@@ -40,6 +40,9 @@ export class ProductsController {
       hsnCode: string;
       gstRate?: number;
       lowStockThreshold?: number;
+      description?: string;
+      packSize?: string;
+      prebookEnabled?: boolean;
     },
     @CurrentUser() user: JwtPayload,
   ) {

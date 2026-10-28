@@ -95,7 +95,7 @@ export class SalesService {
     return order;
   }
 
-  async confirmOrder(orderId: string, userId: string, options?: { withGst?: boolean }) {
+  async confirmOrder(orderId: string, userId: string, options?: { withGst?: boolean; taxInclusive?: boolean }) {
     const withGst = options?.withGst !== false;
     const sellerState = this.config.get('COMPANY_STATE') || 'Maharashtra';
     const sellerGstin = this.config.get('COMPANY_GSTIN') || '';
@@ -187,25 +187,59 @@ export class SalesService {
       let sgstTotal = 0;
       let igstTotal = 0;
 
+      const isTaxInclusive = options?.taxInclusive || Boolean(order.notes?.includes('Pre-booking'));
+
       const invoiceItemsData = order.items.map((item) => {
         const qty = Number(item.qty);
         const rate = Number(item.rate);
-        const taxable = qty * rate;
+        const lineGross = Math.round(qty * rate * 100) / 100;
 
         // Without GST (parchi / trade bill): no tax lines, stock still deducted
         if (!withGst) {
-          subtotal += taxable;
+          subtotal += lineGross;
           return {
             productId: item.productId,
             qty: item.qty,
             rate: item.rate,
             hsnCode: item.product.hsnCode,
             gstRate: 0,
-            taxable,
+            taxable: lineGross,
             cgst: 0,
             sgst: 0,
             igst: 0,
-            lineTotal: taxable,
+            lineTotal: lineGross,
+          };
+        }
+
+        // Pre-booking / Tax Inclusive retail pricing (5% GST directly included in price)
+        if (isTaxInclusive) {
+          const gstRate = Number(item.product.gstRate) || 5;
+          const taxable = Math.round((lineGross / (1 + gstRate / 100)) * 100) / 100;
+          const gstAmount = Math.round((lineGross - taxable) * 100) / 100;
+          let cgst = 0;
+          let sgst = 0;
+          let igst = 0;
+          if (interState) {
+            igst = gstAmount;
+          } else {
+            cgst = Math.round((gstAmount / 2) * 100) / 100;
+            sgst = Math.round((gstAmount - cgst) * 100) / 100;
+          }
+          subtotal += taxable;
+          cgstTotal += cgst;
+          sgstTotal += sgst;
+          igstTotal += igst;
+          return {
+            productId: item.productId,
+            qty: item.qty,
+            rate: item.rate,
+            hsnCode: item.product.hsnCode,
+            gstRate,
+            taxable,
+            cgst,
+            sgst,
+            igst,
+            lineTotal: lineGross,
           };
         }
 
@@ -235,8 +269,10 @@ export class SalesService {
         };
       });
 
-      const gstAmount = cgstTotal + sgstTotal + igstTotal;
-      const total = subtotal + gstAmount;
+      const gstAmount = Math.round((cgstTotal + sgstTotal + igstTotal) * 100) / 100;
+      const total = isTaxInclusive && withGst
+        ? Math.round(order.items.reduce((sum, i) => sum + Number(i.qty) * Number(i.rate), 0) * 100) / 100
+        : Math.round((subtotal + gstAmount) * 100) / 100;
 
       const invoice = await tx.invoice.create({
         data: {

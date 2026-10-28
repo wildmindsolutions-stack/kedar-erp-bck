@@ -52,6 +52,9 @@ export declare class SalesController {
                 hsnCode: string;
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
+                description: string | null;
+                packSize: string | null;
+                prebookEnabled: boolean;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
                 isDeleted: boolean;
             };
@@ -86,6 +89,9 @@ export declare class SalesController {
                 hsnCode: string;
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
+                description: string | null;
+                packSize: string | null;
+                prebookEnabled: boolean;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
                 isDeleted: boolean;
             };
@@ -186,6 +192,9 @@ export declare class SalesController {
                 hsnCode: string;
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
+                description: string | null;
+                packSize: string | null;
+                prebookEnabled: boolean;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
                 isDeleted: boolean;
             };
@@ -222,6 +231,9 @@ export declare class SalesController {
                 hsnCode: string;
                 gstRate: import("@prisma/client/runtime/library").Decimal;
                 imageUrl: string | null;
+                description: string | null;
+                packSize: string | null;
+                prebookEnabled: boolean;
                 lowStockThreshold: import("@prisma/client/runtime/library").Decimal;
                 isDeleted: boolean;
             };

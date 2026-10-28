@@ -67,6 +67,9 @@ model Product {
   hsnCode           String             @map("hsn_code")
   gstRate           Decimal            @default(5) @map("gst_rate") @db.Decimal(5, 2)
   imageUrl          String?            @map("image_url")
+  description       String?
+  packSize          String?            @map("pack_size")
+  prebookEnabled    Boolean            @default(false) @map("prebook_enabled")
   lowStockThreshold Decimal            @default(10) @map("low_stock_threshold") @db.Decimal(12, 3)
   isActive          Boolean            @default(true) @map("is_active")
   isDeleted         Boolean            @default(false) @map("is_deleted")
@@ -78,6 +81,7 @@ model Product {
   stockLedger       StockLedger[]
   orderItems        OrderItem[]
   invoiceItems      InvoiceItem[]
+  preBookingItems   PreBookingItem[]
 
   @@map("products")
 }
@@ -101,6 +105,7 @@ model Customer {
   payments        Payment[]
   foundationAccount FoundationAccount?
   customerNotifications CustomerNotification[]
+  preBookings     PreBooking[]
 
   @@map("customers")
 }
@@ -190,8 +195,72 @@ model SalesOrder {
   creator    User?       @relation(fields: [createdBy], references: [id])
   items      OrderItem[]
   invoice    Invoice?
+  preBooking PreBooking?
 
   @@map("sales_orders")
+}
+
+enum PreBookingStatus {
+  PENDING
+  CONFIRMED
+  DELIVERED
+  CANCELLED
+}
+
+/// Guest pre-bookings from the Kedar Foundation website (cash on delivery).
+/// Kept apart from sales orders until staff confirm; confirming creates the order + invoice.
+model PreBooking {
+  id           String           @id @default(cuid())
+  bookingNo    String           @unique @map("booking_no")
+  name         String
+  phone        String
+  email        String?
+  address      String
+  city         String
+  state        String
+  pincode      String
+  notes        String?
+  status       PreBookingStatus @default(PENDING)
+  paymentMode  PaymentMode      @default(CASH) @map("payment_mode")
+  paymentReceived Boolean       @default(false) @map("payment_received")
+  subtotal     Decimal          @db.Decimal(12, 2)
+  total        Decimal          @db.Decimal(12, 2)
+  customerId   String?          @map("customer_id")
+  salesOrderId String?          @unique @map("sales_order_id")
+  confirmedAt  DateTime?        @map("confirmed_at")
+  deliveredAt  DateTime?        @map("delivered_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+  customer     Customer?        @relation(fields: [customerId], references: [id])
+  salesOrder   SalesOrder?      @relation(fields: [salesOrderId], references: [id])
+  items        PreBookingItem[]
+
+  @@index([status])
+  @@index([phone])
+  @@map("pre_bookings")
+}
+
+model PreBookingItem {
+  id           String     @id @default(cuid())
+  preBookingId String     @map("pre_booking_id")
+  productId    String     @map("product_id")
+  productName  String     @map("product_name")
+  packSize     String?    @map("pack_size")
+  qty          Decimal    @db.Decimal(12, 3)
+  rate         Decimal    @db.Decimal(12, 2)
+  lineTotal    Decimal    @map("line_total") @db.Decimal(12, 2)
+  preBooking   PreBooking @relation(fields: [preBookingId], references: [id], onDelete: Cascade)
+  product      Product    @relation(fields: [productId], references: [id])
+
+  @@map("pre_booking_items")
+}
+
+model PreBookingSequence {
+  id            String @id @default(cuid())
+  financialYear String @unique @map("financial_year")
+  lastNumber    Int    @default(0) @map("last_number")
+
+  @@map("pre_booking_sequences")
 }
 
 model OrderItem {
