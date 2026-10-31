@@ -28,11 +28,11 @@ let PreBookingAdminController = class PreBookingAdminController {
     findAll(status) {
         return this.preBookingService.findAll(status);
     }
-    confirm(id, body, user) {
-        return this.preBookingService.confirm(id, user.sub, {
-            generateInvoice: body?.generateInvoice === true,
-            withGst: body?.withGst !== false,
-        });
+    summary() {
+        return this.preBookingService.getSummary();
+    }
+    confirm(id, user) {
+        return this.preBookingService.confirm(id, user.sub);
     }
     generateInvoice(id, body, user) {
         if (!(0, permissions_1.canConfirmSalesOrders)(user.role)) {
@@ -40,15 +40,8 @@ let PreBookingAdminController = class PreBookingAdminController {
         }
         return this.preBookingService.generateInvoice(id, user.sub, body?.withGst !== false);
     }
-    markDelivered(id, body, user) {
-        return this.preBookingService.markDelivered(id, user.sub, {
-            paymentReceived: body?.paymentReceived !== false,
-            generateInvoice: body?.generateInvoice === true,
-            withGst: body?.withGst !== false,
-        });
-    }
-    cancel(id) {
-        return this.preBookingService.cancel(id);
+    cancel(id, body) {
+        return this.preBookingService.cancel(id, body?.reason);
     }
 };
 exports.PreBookingAdminController = PreBookingAdminController;
@@ -61,13 +54,19 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PreBookingAdminController.prototype, "findAll", null);
 __decorate([
+    (0, common_1.Get)('summary'),
+    (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.DASHBOARD_READ),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], PreBookingAdminController.prototype, "summary", null);
+__decorate([
     (0, common_1.Post)(':id/confirm'),
     (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.SALES_WRITE),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __param(2, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, prebooking_dto_1.ConfirmPreBookingDto, Object]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], PreBookingAdminController.prototype, "confirm", null);
 __decorate([
@@ -81,21 +80,12 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PreBookingAdminController.prototype, "generateInvoice", null);
 __decorate([
-    (0, common_1.Patch)(':id/delivered'),
-    (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.SALES_WRITE),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __param(2, (0, current_user_decorator_1.CurrentUser)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, prebooking_dto_1.DeliverPreBookingDto, Object]),
-    __metadata("design:returntype", void 0)
-], PreBookingAdminController.prototype, "markDelivered", null);
-__decorate([
     (0, common_1.Patch)(':id/cancel'),
     (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.SALES_WRITE),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, prebooking_dto_1.ReasonDto]),
     __metadata("design:returntype", void 0)
 ], PreBookingAdminController.prototype, "cancel", null);
 exports.PreBookingAdminController = PreBookingAdminController = __decorate([

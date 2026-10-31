@@ -9,10 +9,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeliverPreBookingDto = exports.GenerateInvoiceDto = exports.ConfirmPreBookingDto = exports.CreatePreBookingDto = exports.PreBookingItemDto = void 0;
+exports.CustomerCancelDto = exports.ReasonDto = exports.FieldDeliverDto = exports.AssignExecutiveDto = exports.SetBookingAreaDto = exports.GenerateInvoiceDto = exports.CreatePreBookingDto = exports.PreBookingItemDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const phone_util_1 = require("../../common/utils/phone.util");
+const indian_states_1 = require("../../common/constants/indian-states");
 const trim = ({ value }) => typeof value === 'string' ? value.trim() : value;
 class PreBookingItemDto {
 }
@@ -68,8 +69,7 @@ __decorate([
 ], CreatePreBookingDto.prototype, "city", void 0);
 __decorate([
     (0, class_transformer_1.Transform)(trim),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.Length)(2, 60),
+    (0, class_validator_1.IsIn)(indian_states_1.INDIAN_STATES, { message: 'Please select your state' }),
     __metadata("design:type", String)
 ], CreatePreBookingDto.prototype, "state", void 0);
 __decorate([
@@ -97,19 +97,6 @@ __decorate([
     (0, class_transformer_1.Type)(() => PreBookingItemDto),
     __metadata("design:type", Array)
 ], CreatePreBookingDto.prototype, "items", void 0);
-class ConfirmPreBookingDto {
-}
-exports.ConfirmPreBookingDto = ConfirmPreBookingDto;
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], ConfirmPreBookingDto.prototype, "generateInvoice", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], ConfirmPreBookingDto.prototype, "withGst", void 0);
 class GenerateInvoiceDto {
 }
 exports.GenerateInvoiceDto = GenerateInvoiceDto;
@@ -118,22 +105,45 @@ __decorate([
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], GenerateInvoiceDto.prototype, "withGst", void 0);
-class DeliverPreBookingDto {
+class SetBookingAreaDto {
 }
-exports.DeliverPreBookingDto = DeliverPreBookingDto;
+exports.SetBookingAreaDto = SetBookingAreaDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], SetBookingAreaDto.prototype, "areaId", void 0);
+class AssignExecutiveDto {
+}
+exports.AssignExecutiveDto = AssignExecutiveDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], AssignExecutiveDto.prototype, "executiveId", void 0);
+class FieldDeliverDto {
+}
+exports.FieldDeliverDto = FieldDeliverDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
-], DeliverPreBookingDto.prototype, "paymentReceived", void 0);
+], FieldDeliverDto.prototype, "paymentReceived", void 0);
+class ReasonDto {
+}
+exports.ReasonDto = ReasonDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], DeliverPreBookingDto.prototype, "generateInvoice", void 0);
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(200),
+    __metadata("design:type", String)
+], ReasonDto.prototype, "reason", void 0);
+class CustomerCancelDto {
+}
+exports.CustomerCancelDto = CustomerCancelDto;
 __decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], DeliverPreBookingDto.prototype, "withGst", void 0);
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CustomerCancelDto.prototype, "bookingNo", void 0);
 //# sourceMappingURL=prebooking.dto.js.map

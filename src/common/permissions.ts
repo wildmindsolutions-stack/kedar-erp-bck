@@ -32,6 +32,9 @@ export const MODULE_PERMISSIONS: Record<string, Permission[]> = {
   users: [PERMISSIONS.USERS_READ, PERMISSIONS.USERS_WRITE],
 };
 
+export const DELIVERY_SUPERVISOR = 'Delivery Supervisor';
+export const DELIVERY_EXECUTIVE = 'Delivery Executive';
+
 export const ROLE_PERMISSIONS: Record<string, Permission[] | ['*']> = {
   Owner: ['*'],
   Admin: ['*'],
@@ -72,6 +75,8 @@ export const ROLE_PERMISSIONS: Record<string, Permission[] | ['*']> = {
     PERMISSIONS.DELIVERY_WRITE,
     PERMISSIONS.PRODUCTS_READ,
   ],
+  [DELIVERY_SUPERVISOR]: [PERMISSIONS.DELIVERY_READ, PERMISSIONS.DELIVERY_WRITE],
+  [DELIVERY_EXECUTIVE]: [PERMISSIONS.DELIVERY_READ, PERMISSIONS.DELIVERY_WRITE],
   Sales: [
     PERMISSIONS.DASHBOARD_READ,
     PERMISSIONS.SALES_READ,
@@ -102,6 +107,16 @@ export function getRolePermissions(roleName: string): Permission[] {
     return Object.values(PERMISSIONS);
   }
   return perms as Permission[];
+}
+
+/** Field staff only see the pre-bookings routed to them. */
+export function isFieldDeliveryRole(role: string): boolean {
+  return role === DELIVERY_SUPERVISOR || role === DELIVERY_EXECUTIVE;
+}
+
+/** Who may set up areas, teams and override assignments. */
+export function canManageDeliveryAreas(role: string): boolean {
+  return ['Owner', 'Admin', 'Manager'].includes(role);
 }
 
 export function canConfirmSalesOrders(role: string): boolean {

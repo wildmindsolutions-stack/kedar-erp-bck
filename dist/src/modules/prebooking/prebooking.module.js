@@ -10,8 +10,8 @@ exports.PreBookingModule = void 0;
 const common_1 = require("@nestjs/common");
 const prebooking_controller_1 = require("./prebooking.controller");
 const prebooking_admin_controller_1 = require("./prebooking-admin.controller");
+const prebooking_delivery_controller_1 = require("./prebooking-delivery.controller");
 const prebooking_service_1 = require("./prebooking.service");
-const prebook_rate_limit_guard_1 = require("./prebook-rate-limit.guard");
 const customers_module_1 = require("../customers/customers.module");
 const sales_module_1 = require("../sales/sales.module");
 const payments_module_1 = require("../payments/payments.module");
@@ -21,8 +21,12 @@ exports.PreBookingModule = PreBookingModule;
 exports.PreBookingModule = PreBookingModule = __decorate([
     (0, common_1.Module)({
         imports: [customers_module_1.CustomersModule, sales_module_1.SalesModule, payments_module_1.PaymentsModule],
-        controllers: [prebooking_controller_1.PreBookingController, prebooking_admin_controller_1.PreBookingAdminController],
-        providers: [prebooking_service_1.PreBookingService, prebook_rate_limit_guard_1.PrebookRateLimitGuard],
+        controllers: [
+            prebooking_controller_1.PreBookingController,
+            prebooking_admin_controller_1.PreBookingAdminController,
+            prebooking_delivery_controller_1.PreBookingDeliveryController,
+        ],
+        providers: [prebooking_service_1.PreBookingService],
     })
 ], PreBookingModule);
 //# sourceMappingURL=prebooking.module.js.map

@@ -17,6 +17,8 @@ export class DeliveryService {
         isDeleted: false,
         status: 'ISSUED',
         deliveries: { none: {} },
+        // Pre-bookings are delivered from the delivery board, not by challan
+        order: { preBooking: { is: null } },
       },
       include: {
         order: { include: { customer: true } },

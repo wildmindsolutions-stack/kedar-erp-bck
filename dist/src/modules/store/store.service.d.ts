@@ -178,11 +178,11 @@ export declare class StoreService {
                 notes: string | null;
                 status: import(".prisma/client").$Enums.DeliveryStatus;
                 invoiceId: string;
+                deliveredAt: Date | null;
                 challanNo: string;
                 vehicle: string | null;
                 driverName: string | null;
                 dispatchedAt: Date | null;
-                deliveredAt: Date | null;
             }[];
             items: {
                 qty: number;

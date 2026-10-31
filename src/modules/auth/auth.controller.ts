@@ -3,12 +3,15 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { CurrentUser, JwtPayload } from '../../common/decorators/current-user.decorator';
+import { RateLimit, RateLimitGuard } from '../../common/guards/rate-limit.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
+  @UseGuards(RateLimitGuard)
+  @RateLimit(10)
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }

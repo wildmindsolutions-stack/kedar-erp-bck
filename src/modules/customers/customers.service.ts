@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { getCustomerOutstanding } from '../../common/utils/gst.util';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -98,6 +99,19 @@ export class CustomersService {
   }>) {
     const { phone: _phone, ...updatable } = data;
     return this.prisma.customer.update({ where: { id }, data: updatable });
+  }
+
+  async resetWebsitePassword(customerId: string, password: string) {
+    if (!password || password.length < 6) {
+      throw new BadRequestException('Password must be at least 6 characters');
+    }
+    const account = await this.prisma.foundationAccount.findUnique({ where: { customerId } });
+    if (!account) throw new NotFoundException('This customer has no website account');
+    await this.prisma.foundationAccount.update({
+      where: { customerId },
+      data: { passwordHash: await bcrypt.hash(password, 10) },
+    });
+    return { email: account.email };
   }
 
   remove(id: string) {

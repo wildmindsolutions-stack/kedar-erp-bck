@@ -47,6 +47,22 @@ export class NotificationsService {
     });
   }
 
+  /** Notify one specific user (e.g. the supervisor of an area). */
+  notifyUser(userId: string, payload: Omit<NotifyPayload, 'notifyAdmins'>) {
+    return this.prisma.notification.create({
+      data: {
+        userId,
+        type: payload.type,
+        module: payload.module,
+        title: payload.title,
+        message: payload.message,
+        refId: payload.refId,
+        link: payload.link,
+        createdBy: payload.actorId,
+      },
+    });
+  }
+
   getForUser(userId: string, limit = 30) {
     return this.prisma.notification.findMany({
       where: { userId },

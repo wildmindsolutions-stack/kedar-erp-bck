@@ -4,6 +4,7 @@ import {
   IsArray,
   IsBoolean,
   IsEmail,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -17,6 +18,7 @@ import {
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { normalizePhone } from '../../common/utils/phone.util';
+import { INDIAN_STATES } from '../../common/constants/indian-states';
 
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;
@@ -68,8 +70,7 @@ export class CreatePreBookingDto {
   city: string;
 
   @Transform(trim)
-  @IsString()
-  @Length(2, 60)
+  @IsIn(INDIAN_STATES, { message: 'Please select your state' })
   state: string;
 
   @Transform(trim)
@@ -95,32 +96,39 @@ export class CreatePreBookingDto {
   items: PreBookingItemDto[];
 }
 
-export class ConfirmPreBookingDto {
-  @IsOptional()
-  @IsBoolean()
-  generateInvoice?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  withGst?: boolean;
-}
-
 export class GenerateInvoiceDto {
   @IsOptional()
   @IsBoolean()
   withGst?: boolean;
 }
 
-export class DeliverPreBookingDto {
+export class SetBookingAreaDto {
+  @IsString()
+  @IsNotEmpty()
+  areaId: string;
+}
+
+export class AssignExecutiveDto {
+  @IsString()
+  @IsNotEmpty()
+  executiveId: string;
+}
+
+export class FieldDeliverDto {
   @IsOptional()
   @IsBoolean()
   paymentReceived?: boolean;
+}
 
+export class ReasonDto {
   @IsOptional()
-  @IsBoolean()
-  generateInvoice?: boolean;
+  @IsString()
+  @MaxLength(200)
+  reason?: string;
+}
 
-  @IsOptional()
-  @IsBoolean()
-  withGst?: boolean;
+export class CustomerCancelDto {
+  @IsString()
+  @IsNotEmpty()
+  bookingNo: string;
 }

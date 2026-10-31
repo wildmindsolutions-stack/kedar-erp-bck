@@ -30,6 +30,9 @@ let CustomersController = class CustomersController {
     findOne(id) {
         return this.customersService.findOne(id);
     }
+    resetWebsitePassword(id, body) {
+        return this.customersService.resetWebsitePassword(id, body?.password);
+    }
     create(body, user) {
         return this.customersService.create({ ...body, createdBy: user.sub });
     }
@@ -56,6 +59,15 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Post)(':id/reset-website-password'),
+    (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.CUSTOMERS_WRITE),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], CustomersController.prototype, "resetWebsitePassword", null);
 __decorate([
     (0, common_1.Post)(),
     (0, require_permission_decorator_1.RequirePermission)(permissions_1.PERMISSIONS.CUSTOMERS_WRITE),

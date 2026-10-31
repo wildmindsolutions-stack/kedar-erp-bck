@@ -23,6 +23,13 @@ export class CustomersController {
     return this.customersService.findOne(id);
   }
 
+  /** Website customers have no email/SMS reset yet, so staff set a new password. */
+  @Post(':id/reset-website-password')
+  @RequirePermission(PERMISSIONS.CUSTOMERS_WRITE)
+  resetWebsitePassword(@Param('id') id: string, @Body() body: { password: string }) {
+    return this.customersService.resetWebsitePassword(id, body?.password);
+  }
+
   @Post()
   @RequirePermission(PERMISSIONS.CUSTOMERS_WRITE)
   create(

@@ -15,13 +15,13 @@ export declare class NotificationsController {
         createdAt: Date;
         createdBy: string | null;
         refId: string | null;
-        userId: string;
-        type: string;
         module: string;
+        type: string;
         title: string;
         message: string;
         link: string | null;
         isRead: boolean;
+        userId: string;
     })[]>;
     getUnreadCount(user: JwtPayload): import(".prisma/client").Prisma.PrismaPromise<number>;
     markAllRead(user: JwtPayload): import(".prisma/client").Prisma.PrismaPromise<import(".prisma/client").Prisma.BatchPayload>;

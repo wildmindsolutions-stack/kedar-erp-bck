@@ -102,6 +102,9 @@ export declare class CustomersService {
         state: string;
         creditLimit: import("@prisma/client/runtime/library").Decimal;
     }, never, import("@prisma/client/runtime/library").DefaultArgs>;
+    resetWebsitePassword(customerId: string, password: string): Promise<{
+        email: string;
+    }>;
     remove(id: string): import(".prisma/client").Prisma.Prisma__CustomerClient<{
         id: string;
         name: string;

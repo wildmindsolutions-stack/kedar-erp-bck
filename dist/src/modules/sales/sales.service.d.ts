@@ -225,6 +225,8 @@ export declare class SalesService {
     confirmOrder(orderId: string, userId: string, options?: {
         withGst?: boolean;
         taxInclusive?: boolean;
+        buyerState?: string;
+        fulfilled?: boolean;
     }): Promise<{
         items: ({
             product: {

@@ -102,11 +102,11 @@ export declare class DeliveryController {
         notes: string | null;
         status: import(".prisma/client").$Enums.DeliveryStatus;
         invoiceId: string;
+        deliveredAt: Date | null;
         challanNo: string;
         vehicle: string | null;
         driverName: string | null;
         dispatchedAt: Date | null;
-        deliveredAt: Date | null;
     })[]>;
     create(body: {
         invoiceId: string;
@@ -166,11 +166,11 @@ export declare class DeliveryController {
         notes: string | null;
         status: import(".prisma/client").$Enums.DeliveryStatus;
         invoiceId: string;
+        deliveredAt: Date | null;
         challanNo: string;
         vehicle: string | null;
         driverName: string | null;
         dispatchedAt: Date | null;
-        deliveredAt: Date | null;
     }>;
     dispatch(id: string, body: {
         vehicle?: string;
@@ -228,11 +228,11 @@ export declare class DeliveryController {
         notes: string | null;
         status: import(".prisma/client").$Enums.DeliveryStatus;
         invoiceId: string;
+        deliveredAt: Date | null;
         challanNo: string;
         vehicle: string | null;
         driverName: string | null;
         dispatchedAt: Date | null;
-        deliveredAt: Date | null;
     }>;
     markDelivered(id: string, user: JwtPayload): Promise<{
         invoice: {
@@ -287,10 +287,10 @@ export declare class DeliveryController {
         notes: string | null;
         status: import(".prisma/client").$Enums.DeliveryStatus;
         invoiceId: string;
+        deliveredAt: Date | null;
         challanNo: string;
         vehicle: string | null;
         driverName: string | null;
         dispatchedAt: Date | null;
-        deliveredAt: Date | null;
     }>;
 }

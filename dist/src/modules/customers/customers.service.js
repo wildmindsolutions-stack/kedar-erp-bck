@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomersService = void 0;
+const bcrypt = require("bcrypt");
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const gst_util_1 = require("../../common/utils/gst.util");
@@ -81,6 +82,19 @@ let CustomersService = class CustomersService {
     update(id, data) {
         const { phone: _phone, ...updatable } = data;
         return this.prisma.customer.update({ where: { id }, data: updatable });
+    }
+    async resetWebsitePassword(customerId, password) {
+        if (!password || password.length < 6) {
+            throw new common_1.BadRequestException('Password must be at least 6 characters');
+        }
+        const account = await this.prisma.foundationAccount.findUnique({ where: { customerId } });
+        if (!account)
+            throw new common_1.NotFoundException('This customer has no website account');
+        await this.prisma.foundationAccount.update({
+            where: { customerId },
+            data: { passwordHash: await bcrypt.hash(password, 10) },
+        });
+        return { email: account.email };
     }
     remove(id) {
         return this.prisma.customer.update({

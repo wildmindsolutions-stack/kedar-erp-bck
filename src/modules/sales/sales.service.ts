@@ -95,7 +95,14 @@ export class SalesService {
     return order;
   }
 
-  async confirmOrder(orderId: string, userId: string, options?: { withGst?: boolean; taxInclusive?: boolean }) {
+  async confirmOrder(orderId: string, userId: string, options?: {
+    withGst?: boolean;
+    taxInclusive?: boolean;
+    /** Place of supply when it differs from the customer record (delivery address). */
+    buyerState?: string;
+    /** Goods already delivered: stock and ledger are done, so this only issues the paper. */
+    fulfilled?: boolean;
+  }) {
     const withGst = options?.withGst !== false;
     const sellerState = this.config.get('COMPANY_STATE') || 'Maharashtra';
     const sellerGstin = this.config.get('COMPANY_GSTIN') || '';
@@ -118,7 +125,7 @@ export class SalesService {
         throw new BadRequestException('Cannot confirm cancelled order');
       }
 
-      for (const item of order.items) {
+      for (const item of options?.fulfilled ? [] : order.items) {
         const stock = await getProductStock(tx as unknown as PrismaService, item.productId);
         const needed = Number(item.qty);
         if (stock < needed) {
@@ -154,14 +161,14 @@ export class SalesService {
         0,
       );
       const creditLimit = Number(order.customer.creditLimit);
-      if (creditLimit > 0 && outstanding + orderTotal > creditLimit) {
+      if (!options?.fulfilled && creditLimit > 0 && outstanding + orderTotal > creditLimit) {
         const available = Math.max(0, creditLimit - outstanding);
         throw new BadRequestException(
           `Customer credit limit exceeded. Credit limit: ₹${creditLimit.toFixed(2)}, outstanding: ₹${outstanding.toFixed(2)}, order total: ₹${orderTotal.toFixed(2)}, available credit: ₹${available.toFixed(2)}.`,
         );
       }
 
-      const interState = isInterState(sellerState, order.customer.state);
+      const interState = isInterState(sellerState, options?.buyerState ?? order.customer.state);
       const fy = getFinancialYear();
 
       const seq = await tx.$queryRaw<{ last_number: number }[]>`
@@ -294,7 +301,7 @@ export class SalesService {
         include: { items: { include: { product: true } }, order: { include: { customer: true } } },
       });
 
-      for (const item of order.items) {
+      for (const item of options?.fulfilled ? [] : order.items) {
         await tx.stockLedger.create({
           data: {
             productId: item.productId,
@@ -306,7 +313,7 @@ export class SalesService {
         });
       }
 
-      await tx.customerLedger.create({
+      if (!options?.fulfilled) await tx.customerLedger.create({
         data: {
           customerId: order.customerId,
           amount: total,
@@ -356,7 +363,7 @@ export class SalesService {
       actorId: userId,
     });
 
-    await this.notifications.notifyByModule({
+    if (!options?.fulfilled) await this.notifications.notifyByModule({
       module: 'inventory',
       type: 'STOCK_DEDUCTED',
       title: 'Stock Deducted for Sale',
@@ -366,7 +373,7 @@ export class SalesService {
       actorId: userId,
     });
 
-    await this.notifications.notifyByModule({
+    if (!options?.fulfilled) await this.notifications.notifyByModule({
       module: 'delivery',
       type: 'READY_FOR_DISPATCH',
       title: 'Invoice Ready for Dispatch',

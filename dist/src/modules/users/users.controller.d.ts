@@ -21,6 +21,7 @@ export declare class UsersController {
         email: string;
         passwordHash: string;
         roleId: string;
+        supervisorId: string | null;
     })[]>;
     findRoles(): import(".prisma/client").Prisma.PrismaPromise<({
         _count: {
@@ -57,6 +58,7 @@ export declare class UsersController {
         email: string;
         passwordHash: string;
         roleId: string;
+        supervisorId: string | null;
     }>;
     updateRole(roleId: string, body: {
         isActive?: boolean;
@@ -99,6 +101,7 @@ export declare class UsersController {
         email: string;
         passwordHash: string;
         roleId: string;
+        supervisorId: string | null;
     }>;
     deactivate(id: string, user: JwtPayload): Promise<{
         role: {
@@ -118,6 +121,7 @@ export declare class UsersController {
         email: string;
         passwordHash: string;
         roleId: string;
+        supervisorId: string | null;
     }>;
     resetPassword(id: string, body: {
         password: string;
@@ -139,5 +143,6 @@ export declare class UsersController {
         email: string;
         passwordHash: string;
         roleId: string;
+        supervisorId: string | null;
     }>;
 }

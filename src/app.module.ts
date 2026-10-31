@@ -16,6 +16,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { CustomerNotificationsModule } from './modules/customer-notifications/customer-notifications.module';
 import { StoreModule } from './modules/store/store.module';
 import { PreBookingModule } from './modules/prebooking/prebooking.module';
+import { DeliveryAreasModule } from './modules/delivery-areas/delivery-areas.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { PreBookingModule } from './modules/prebooking/prebooking.module';
     DashboardModule,
     StoreModule,
     PreBookingModule,
+    DeliveryAreasModule,
   ],
   controllers: [AppController],
 })

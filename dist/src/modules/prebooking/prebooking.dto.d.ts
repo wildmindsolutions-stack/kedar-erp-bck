@@ -14,15 +14,21 @@ export declare class CreatePreBookingDto {
     website?: string;
     items: PreBookingItemDto[];
 }
-export declare class ConfirmPreBookingDto {
-    generateInvoice?: boolean;
-    withGst?: boolean;
-}
 export declare class GenerateInvoiceDto {
     withGst?: boolean;
 }
-export declare class DeliverPreBookingDto {
+export declare class SetBookingAreaDto {
+    areaId: string;
+}
+export declare class AssignExecutiveDto {
+    executiveId: string;
+}
+export declare class FieldDeliverDto {
     paymentReceived?: boolean;
-    generateInvoice?: boolean;
-    withGst?: boolean;
+}
+export declare class ReasonDto {
+    reason?: string;
+}
+export declare class CustomerCancelDto {
+    bookingNo: string;
 }

@@ -8,7 +8,7 @@ export function getFinancialYear(date = new Date()): string {
 }
 
 export function isInterState(sellerState: string, buyerState: string): boolean {
-  return sellerState.toLowerCase() !== buyerState.toLowerCase();
+  return sellerState.trim().toLowerCase() !== buyerState.trim().toLowerCase();
 }
 
 export interface GstLineItem {

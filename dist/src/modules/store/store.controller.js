@@ -18,6 +18,7 @@ const store_service_1 = require("./store.service");
 const products_service_1 = require("../products/products.service");
 const store_dto_1 = require("./store.dto");
 const foundation_auth_guard_1 = require("../../common/guards/foundation-auth.guard");
+const rate_limit_guard_1 = require("../../common/guards/rate-limit.guard");
 let StoreController = class StoreController {
     constructor(storeService, productsService) {
         this.storeService = storeService;
@@ -80,6 +81,8 @@ __decorate([
 ], StoreController.prototype, "findProduct", null);
 __decorate([
     (0, common_1.Post)('auth/register'),
+    (0, common_1.UseGuards)(rate_limit_guard_1.RateLimitGuard),
+    (0, rate_limit_guard_1.RateLimit)(5),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [store_dto_1.StoreRegisterDto]),
@@ -87,6 +90,8 @@ __decorate([
 ], StoreController.prototype, "register", null);
 __decorate([
     (0, common_1.Post)('auth/login'),
+    (0, common_1.UseGuards)(rate_limit_guard_1.RateLimitGuard),
+    (0, rate_limit_guard_1.RateLimit)(10),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [store_dto_1.StoreLoginDto]),

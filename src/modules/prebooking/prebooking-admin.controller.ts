@@ -11,11 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { PreBookingService } from './prebooking.service';
-import {
-  ConfirmPreBookingDto,
-  DeliverPreBookingDto,
-  GenerateInvoiceDto,
-} from './prebooking.dto';
+import { GenerateInvoiceDto, ReasonDto } from './prebooking.dto';
 import {
   CurrentUser,
   JwtPayload,
@@ -35,17 +31,16 @@ export class PreBookingAdminController {
     return this.preBookingService.findAll(status);
   }
 
+  @Get('summary')
+  @RequirePermission(PERMISSIONS.DASHBOARD_READ)
+  summary() {
+    return this.preBookingService.getSummary();
+  }
+
   @Post(':id/confirm')
   @RequirePermission(PERMISSIONS.SALES_WRITE)
-  confirm(
-    @Param('id') id: string,
-    @Body() body: ConfirmPreBookingDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.preBookingService.confirm(id, user.sub, {
-      generateInvoice: body?.generateInvoice === true,
-      withGst: body?.withGst !== false,
-    });
+  confirm(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.preBookingService.confirm(id, user.sub);
   }
 
   @Post(':id/generate-invoice')
@@ -67,23 +62,9 @@ export class PreBookingAdminController {
     );
   }
 
-  @Patch(':id/delivered')
-  @RequirePermission(PERMISSIONS.SALES_WRITE)
-  markDelivered(
-    @Param('id') id: string,
-    @Body() body: DeliverPreBookingDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.preBookingService.markDelivered(id, user.sub, {
-      paymentReceived: body?.paymentReceived !== false,
-      generateInvoice: body?.generateInvoice === true,
-      withGst: body?.withGst !== false,
-    });
-  }
-
   @Patch(':id/cancel')
   @RequirePermission(PERMISSIONS.SALES_WRITE)
-  cancel(@Param('id') id: string) {
-    return this.preBookingService.cancel(id);
+  cancel(@Param('id') id: string, @Body() body: ReasonDto) {
+    return this.preBookingService.cancel(id, body?.reason);
   }
 }

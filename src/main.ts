@@ -1,9 +1,12 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // One proxy in front (Render): req.ip is the real client, not a spoofable header
+  app.set('trust proxy', 1);
 
   const rawOrigins = process.env.FRONTEND_URL || 'http://localhost:3000';
   const origins = rawOrigins.split(',').map((o) => o.trim()).filter(Boolean);

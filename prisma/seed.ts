@@ -31,6 +31,8 @@ const ROLES = [
       'delivery:read', 'delivery:write', 'products:read',
     ],
   },
+  { name: 'Delivery Supervisor', permissions: ['delivery:read', 'delivery:write'] },
+  { name: 'Delivery Executive', permissions: ['delivery:read', 'delivery:write'] },
   {
     name: 'Sales',
     permissions: [
@@ -46,6 +48,9 @@ const DEMO_USERS = [
   { name: 'Priya Accountant', email: 'accountant@kedarenterprise.com', role: 'Accountant' },
   { name: 'Suresh Warehouse', email: 'warehouse@kedarenterprise.com', role: 'Warehouse' },
   { name: 'Amit Sales', email: 'sales@kedarenterprise.com', role: 'Sales' },
+  { name: 'Mahesh Supervisor', email: 'supervisor@kedarenterprise.com', role: 'Delivery Supervisor' },
+  { name: 'Ravi Executive', email: 'executive@kedarenterprise.com', role: 'Delivery Executive' },
+  { name: 'Kiran Executive', email: 'executive2@kedarenterprise.com', role: 'Delivery Executive' },
 ];
 
 const CATEGORIES = [
@@ -280,6 +285,9 @@ const PREBOOK_PRODUCTS = [
 ];
 
 async function main() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Seed creates demo logins with a shared password. Do not run it on production.');
+  }
   console.log('Seeding Kedar ERP database...');
 
   for (const role of ROLES) {
@@ -365,6 +373,22 @@ async function main() {
     where: { financialYear: fy },
     update: {},
     create: { financialYear: fy, lastNumber: 0 },
+  });
+
+  const supervisor = await prisma.user.findUnique({ where: { email: 'supervisor@kedarenterprise.com' } });
+  await prisma.user.updateMany({
+    where: { email: { in: ['executive@kedarenterprise.com', 'executive2@kedarenterprise.com'] } },
+    data: { supervisorId: supervisor!.id },
+  });
+  await prisma.deliveryArea.upsert({
+    where: { name: 'Dehgam' },
+    update: {},
+    create: { name: 'Dehgam', pincodes: ['382305', '382308'], supervisorId: supervisor!.id },
+  });
+  await prisma.deliveryArea.upsert({
+    where: { name: 'Ahmedabad East' },
+    update: {},
+    create: { name: 'Ahmedabad East', pincodes: ['380024', '380026', '382415'], supervisorId: supervisor!.id },
   });
 
   const sampleCustomers = [

@@ -105,11 +105,11 @@ export declare class DeliveryService {
         notes: string | null;
         status: import(".prisma/client").$Enums.DeliveryStatus;
         invoiceId: string;
+        deliveredAt: Date | null;
         challanNo: string;
         vehicle: string | null;
         driverName: string | null;
         dispatchedAt: Date | null;
-        deliveredAt: Date | null;
     })[]>;
     create(data: {
         invoiceId: string;
@@ -170,11 +170,11 @@ export declare class DeliveryService {
         notes: string | null;
         status: import(".prisma/client").$Enums.DeliveryStatus;
         invoiceId: string;
+        deliveredAt: Date | null;
         challanNo: string;
         vehicle: string | null;
         driverName: string | null;
         dispatchedAt: Date | null;
-        deliveredAt: Date | null;
     }>;
     dispatch(id: string, data: {
         vehicle?: string;
@@ -233,11 +233,11 @@ export declare class DeliveryService {
         notes: string | null;
         status: import(".prisma/client").$Enums.DeliveryStatus;
         invoiceId: string;
+        deliveredAt: Date | null;
         challanNo: string;
         vehicle: string | null;
         driverName: string | null;
         dispatchedAt: Date | null;
-        deliveredAt: Date | null;
     }>;
     markDelivered(id: string, actorId?: string): Promise<{
         invoice: {
@@ -292,10 +292,10 @@ export declare class DeliveryService {
         notes: string | null;
         status: import(".prisma/client").$Enums.DeliveryStatus;
         invoiceId: string;
+        deliveredAt: Date | null;
         challanNo: string;
         vehicle: string | null;
         driverName: string | null;
         dispatchedAt: Date | null;
-        deliveredAt: Date | null;
     }>;
 }

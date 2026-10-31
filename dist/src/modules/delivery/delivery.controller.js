@@ -20,6 +20,7 @@ const current_user_decorator_1 = require("../../common/decorators/current-user.d
 const permissions_guard_1 = require("../../common/guards/permissions.guard");
 const require_permission_decorator_1 = require("../../common/decorators/require-permission.decorator");
 const permissions_1 = require("../../common/permissions");
+const no_field_delivery_guard_1 = require("../../common/guards/no-field-delivery.guard");
 let DeliveryController = class DeliveryController {
     constructor(deliveryService) {
         this.deliveryService = deliveryService;
@@ -85,7 +86,7 @@ __decorate([
 ], DeliveryController.prototype, "markDelivered", null);
 exports.DeliveryController = DeliveryController = __decorate([
     (0, common_1.Controller)('delivery'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), permissions_guard_1.PermissionsGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), no_field_delivery_guard_1.NoFieldDeliveryGuard, permissions_guard_1.PermissionsGuard),
     __metadata("design:paramtypes", [delivery_service_1.DeliveryService])
 ], DeliveryController);
 //# sourceMappingURL=delivery.controller.js.map

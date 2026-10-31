@@ -6,6 +6,7 @@ import { StoreService } from './store.service';
 import { ProductsService } from '../products/products.service';
 import { StoreLoginDto, StorePlaceOrderDto, StoreRegisterDto } from './store.dto';
 import { FoundationAuthGuard } from '../../common/guards/foundation-auth.guard';
+import { RateLimit, RateLimitGuard } from '../../common/guards/rate-limit.guard';
 
 interface FoundationRequest {
   user: { sub: string; customerId: string; type: string };
@@ -32,11 +33,15 @@ export class StoreController {
   }
 
   @Post('auth/register')
+  @UseGuards(RateLimitGuard)
+  @RateLimit(5)
   register(@Body() dto: StoreRegisterDto) {
     return this.storeService.register(dto);
   }
 
   @Post('auth/login')
+  @UseGuards(RateLimitGuard)
+  @RateLimit(10)
   login(@Body() dto: StoreLoginDto) {
     return this.storeService.login(dto);
   }

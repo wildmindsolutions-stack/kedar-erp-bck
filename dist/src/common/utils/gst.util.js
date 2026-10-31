@@ -16,7 +16,7 @@ function getFinancialYear(date = new Date()) {
     return `${year - 1}-${year.toString().slice(-2)}`;
 }
 function isInterState(sellerState, buyerState) {
-    return sellerState.toLowerCase() !== buyerState.toLowerCase();
+    return sellerState.trim().toLowerCase() !== buyerState.trim().toLowerCase();
 }
 function calculateGstLine(item, interState) {
     const taxable = Math.round(item.qty * item.rate * 100) / 100;

@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ROLE_PERMISSIONS = exports.MODULE_PERMISSIONS = exports.PERMISSIONS = void 0;
+exports.ROLE_PERMISSIONS = exports.DELIVERY_EXECUTIVE = exports.DELIVERY_SUPERVISOR = exports.MODULE_PERMISSIONS = exports.PERMISSIONS = void 0;
 exports.hasPermission = hasPermission;
 exports.canAccessModule = canAccessModule;
 exports.getRolePermissions = getRolePermissions;
+exports.isFieldDeliveryRole = isFieldDeliveryRole;
+exports.canManageDeliveryAreas = canManageDeliveryAreas;
 exports.canConfirmSalesOrders = canConfirmSalesOrders;
 exports.PERMISSIONS = {
     DASHBOARD_READ: 'dashboard:read',
@@ -35,6 +37,8 @@ exports.MODULE_PERMISSIONS = {
     products: [exports.PERMISSIONS.PRODUCTS_READ, exports.PERMISSIONS.PRODUCTS_WRITE],
     users: [exports.PERMISSIONS.USERS_READ, exports.PERMISSIONS.USERS_WRITE],
 };
+exports.DELIVERY_SUPERVISOR = 'Delivery Supervisor';
+exports.DELIVERY_EXECUTIVE = 'Delivery Executive';
 exports.ROLE_PERMISSIONS = {
     Owner: ['*'],
     Admin: ['*'],
@@ -75,6 +79,8 @@ exports.ROLE_PERMISSIONS = {
         exports.PERMISSIONS.DELIVERY_WRITE,
         exports.PERMISSIONS.PRODUCTS_READ,
     ],
+    [exports.DELIVERY_SUPERVISOR]: [exports.PERMISSIONS.DELIVERY_READ, exports.PERMISSIONS.DELIVERY_WRITE],
+    [exports.DELIVERY_EXECUTIVE]: [exports.PERMISSIONS.DELIVERY_READ, exports.PERMISSIONS.DELIVERY_WRITE],
     Sales: [
         exports.PERMISSIONS.DASHBOARD_READ,
         exports.PERMISSIONS.SALES_READ,
@@ -107,6 +113,12 @@ function getRolePermissions(roleName) {
         return Object.values(exports.PERMISSIONS);
     }
     return perms;
+}
+function isFieldDeliveryRole(role) {
+    return role === exports.DELIVERY_SUPERVISOR || role === exports.DELIVERY_EXECUTIVE;
+}
+function canManageDeliveryAreas(role) {
+    return ['Owner', 'Admin', 'Manager'].includes(role);
 }
 function canConfirmSalesOrders(role) {
     return ['Owner', 'Admin', 'Manager', 'Accountant'].includes(role);

@@ -1,10 +1,14 @@
 import { PreBookingService } from './prebooking.service';
-import { ConfirmPreBookingDto, DeliverPreBookingDto, GenerateInvoiceDto } from './prebooking.dto';
+import { GenerateInvoiceDto, ReasonDto } from './prebooking.dto';
 import { JwtPayload } from '../../common/decorators/current-user.decorator';
 export declare class PreBookingAdminController {
     private preBookingService;
     constructor(preBookingService: PreBookingService);
     findAll(status?: string): import(".prisma/client").Prisma.PrismaPromise<({
+        supervisor: {
+            id: string;
+            name: string;
+        } | null;
         salesOrder: {
             id: string;
             invoice: {
@@ -25,12 +29,21 @@ export declare class PreBookingAdminController {
             lineTotal: import("@prisma/client/runtime/library").Decimal;
             preBookingId: string;
         }[];
+        area: {
+            id: string;
+            name: string;
+        } | null;
+        executive: {
+            id: string;
+            name: string;
+        } | null;
     } & {
         id: string;
         name: string;
         createdAt: Date;
         updatedAt: Date;
         email: string | null;
+        supervisorId: string | null;
         phone: string;
         address: string;
         city: string;
@@ -40,29 +53,51 @@ export declare class PreBookingAdminController {
         status: import(".prisma/client").$Enums.PreBookingStatus;
         subtotal: import("@prisma/client/runtime/library").Decimal;
         total: import("@prisma/client/runtime/library").Decimal;
-        deliveredAt: Date | null;
-        pincode: string;
-        paymentReceived: boolean;
         bookingNo: string;
+        pincode: string;
         paymentMode: import(".prisma/client").$Enums.PaymentMode;
+        paymentReceived: boolean;
         salesOrderId: string | null;
+        areaId: string | null;
+        executiveId: string | null;
         confirmedAt: Date | null;
+        assignedAt: Date | null;
+        outForDeliveryAt: Date | null;
+        stockDeductedAt: Date | null;
+        cashHandedOverAt: Date | null;
+        failedAttempts: number;
+        lastFailReason: string | null;
+        cancelReason: string | null;
+        deliveredAt: Date | null;
     })[]>;
-    confirm(id: string, body: ConfirmPreBookingDto, user: JwtPayload): Promise<{
+    summary(): Promise<{
+        pending: number;
+        confirmed: number;
+        delivered: number;
+        openValue: number;
+        cashWithStaff: number;
+        demand: {
+            productId: string;
+            productName: string;
+            required: number;
+            stock: number;
+            shortfall: number;
+        }[];
+    }>;
+    confirm(id: string, user: JwtPayload): Promise<{
         bookingNo: string;
         status: string;
-        invoice: {
-            id: string;
-            invoiceNo: string;
-            total: number;
-        } | null;
     }>;
     generateInvoice(id: string, body: GenerateInvoiceDto, user: JwtPayload): Promise<{
         invoiceId: string;
         invoiceNo: string;
         total: number;
     }>;
-    markDelivered(id: string, body: DeliverPreBookingDto, user: JwtPayload): Promise<{
+    cancel(id: string, body: ReasonDto): Promise<{
+        supervisor: {
+            id: string;
+            name: string;
+        } | null;
         salesOrder: {
             id: string;
             invoice: {
@@ -83,56 +118,21 @@ export declare class PreBookingAdminController {
             lineTotal: import("@prisma/client/runtime/library").Decimal;
             preBookingId: string;
         }[];
-    } & {
-        id: string;
-        name: string;
-        createdAt: Date;
-        updatedAt: Date;
-        email: string | null;
-        phone: string;
-        address: string;
-        city: string;
-        state: string;
-        customerId: string | null;
-        notes: string | null;
-        status: import(".prisma/client").$Enums.PreBookingStatus;
-        subtotal: import("@prisma/client/runtime/library").Decimal;
-        total: import("@prisma/client/runtime/library").Decimal;
-        deliveredAt: Date | null;
-        pincode: string;
-        paymentReceived: boolean;
-        bookingNo: string;
-        paymentMode: import(".prisma/client").$Enums.PaymentMode;
-        salesOrderId: string | null;
-        confirmedAt: Date | null;
-    }>;
-    cancel(id: string): Promise<{
-        salesOrder: {
+        area: {
             id: string;
-            invoice: {
-                id: string;
-                invoiceNo: string;
-                withGst: boolean;
-                total: import("@prisma/client/runtime/library").Decimal;
-            } | null;
-            status: import(".prisma/client").$Enums.OrderStatus;
+            name: string;
         } | null;
-        items: {
+        executive: {
             id: string;
-            packSize: string | null;
-            productId: string;
-            productName: string;
-            qty: import("@prisma/client/runtime/library").Decimal;
-            rate: import("@prisma/client/runtime/library").Decimal;
-            lineTotal: import("@prisma/client/runtime/library").Decimal;
-            preBookingId: string;
-        }[];
+            name: string;
+        } | null;
     } & {
         id: string;
         name: string;
         createdAt: Date;
         updatedAt: Date;
         email: string | null;
+        supervisorId: string | null;
         phone: string;
         address: string;
         city: string;
@@ -142,12 +142,21 @@ export declare class PreBookingAdminController {
         status: import(".prisma/client").$Enums.PreBookingStatus;
         subtotal: import("@prisma/client/runtime/library").Decimal;
         total: import("@prisma/client/runtime/library").Decimal;
-        deliveredAt: Date | null;
-        pincode: string;
-        paymentReceived: boolean;
         bookingNo: string;
+        pincode: string;
         paymentMode: import(".prisma/client").$Enums.PaymentMode;
+        paymentReceived: boolean;
         salesOrderId: string | null;
+        areaId: string | null;
+        executiveId: string | null;
         confirmedAt: Date | null;
+        assignedAt: Date | null;
+        outForDeliveryAt: Date | null;
+        stockDeductedAt: Date | null;
+        cashHandedOverAt: Date | null;
+        failedAttempts: number;
+        lastFailReason: string | null;
+        cancelReason: string | null;
+        deliveredAt: Date | null;
     }>;
 }

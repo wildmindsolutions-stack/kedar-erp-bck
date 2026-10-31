@@ -51,6 +51,11 @@ export declare class CustomersController {
         city: string | null;
         state: string;
     } | null>;
+    resetWebsitePassword(id: string, body: {
+        password: string;
+    }): Promise<{
+        email: string;
+    }>;
     create(body: {
         name: string;
         gstin?: string;

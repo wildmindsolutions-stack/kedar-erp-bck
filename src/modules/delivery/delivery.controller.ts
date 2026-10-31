@@ -5,9 +5,10 @@ import { CurrentUser, JwtPayload } from '../../common/decorators/current-user.de
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { RequirePermission } from '../../common/decorators/require-permission.decorator';
 import { PERMISSIONS } from '../../common/permissions';
+import { NoFieldDeliveryGuard } from '../../common/guards/no-field-delivery.guard';
 
 @Controller('delivery')
-@UseGuards(AuthGuard('jwt'), PermissionsGuard)
+@UseGuards(AuthGuard('jwt'), NoFieldDeliveryGuard, PermissionsGuard)
 export class DeliveryController {
   constructor(private deliveryService: DeliveryService) {}
 

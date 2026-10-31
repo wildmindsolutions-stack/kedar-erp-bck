@@ -26,6 +26,7 @@ let DeliveryService = class DeliveryService {
                 isDeleted: false,
                 status: 'ISSUED',
                 deliveries: { none: {} },
+                order: { preBooking: { is: null } },
             },
             include: {
                 order: { include: { customer: true } },

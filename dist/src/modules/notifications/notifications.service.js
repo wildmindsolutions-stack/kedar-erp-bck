@@ -45,6 +45,20 @@ let NotificationsService = class NotificationsService {
             })),
         });
     }
+    notifyUser(userId, payload) {
+        return this.prisma.notification.create({
+            data: {
+                userId,
+                type: payload.type,
+                module: payload.module,
+                title: payload.title,
+                message: payload.message,
+                refId: payload.refId,
+                link: payload.link,
+                createdBy: payload.actorId,
+            },
+        });
+    }
     getForUser(userId, limit = 30) {
         return this.prisma.notification.findMany({
             where: { userId },

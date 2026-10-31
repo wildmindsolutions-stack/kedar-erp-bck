@@ -105,7 +105,7 @@ let SalesService = class SalesService {
             if (order.status === 'CANCELLED') {
                 throw new common_1.BadRequestException('Cannot confirm cancelled order');
             }
-            for (const item of order.items) {
+            for (const item of options?.fulfilled ? [] : order.items) {
                 const stock = await (0, gst_util_1.getProductStock)(tx, item.productId);
                 const needed = Number(item.qty);
                 if (stock < needed) {
@@ -135,11 +135,11 @@ let SalesService = class SalesService {
             const outstanding = await (0, gst_util_1.getCustomerOutstanding)(tx, order.customerId);
             const orderTotal = order.items.reduce((sum, i) => sum + Number(i.qty) * Number(i.rate), 0);
             const creditLimit = Number(order.customer.creditLimit);
-            if (creditLimit > 0 && outstanding + orderTotal > creditLimit) {
+            if (!options?.fulfilled && creditLimit > 0 && outstanding + orderTotal > creditLimit) {
                 const available = Math.max(0, creditLimit - outstanding);
                 throw new common_1.BadRequestException(`Customer credit limit exceeded. Credit limit: ₹${creditLimit.toFixed(2)}, outstanding: ₹${outstanding.toFixed(2)}, order total: ₹${orderTotal.toFixed(2)}, available credit: ₹${available.toFixed(2)}.`);
             }
-            const interState = (0, gst_util_1.isInterState)(sellerState, order.customer.state);
+            const interState = (0, gst_util_1.isInterState)(sellerState, options?.buyerState ?? order.customer.state);
             const fy = (0, gst_util_1.getFinancialYear)();
             const seq = await tx.$queryRaw `
         SELECT last_number FROM invoice_sequences WHERE financial_year = ${fy} FOR UPDATE
@@ -257,7 +257,7 @@ let SalesService = class SalesService {
                 },
                 include: { items: { include: { product: true } }, order: { include: { customer: true } } },
             });
-            for (const item of order.items) {
+            for (const item of options?.fulfilled ? [] : order.items) {
                 await tx.stockLedger.create({
                     data: {
                         productId: item.productId,
@@ -268,15 +268,16 @@ let SalesService = class SalesService {
                     },
                 });
             }
-            await tx.customerLedger.create({
-                data: {
-                    customerId: order.customerId,
-                    amount: total,
-                    type: 'DEBIT',
-                    refId: invoice.id,
-                    notes: withGst ? `Tax Invoice ${invoiceNo}` : `Invoice ${invoiceNo} (without GST)`,
-                },
-            });
+            if (!options?.fulfilled)
+                await tx.customerLedger.create({
+                    data: {
+                        customerId: order.customerId,
+                        amount: total,
+                        type: 'DEBIT',
+                        refId: invoice.id,
+                        notes: withGst ? `Tax Invoice ${invoiceNo}` : `Invoice ${invoiceNo} (without GST)`,
+                    },
+                });
             await tx.salesOrder.update({
                 where: { id: orderId },
                 data: { status: 'CONFIRMED' },
@@ -311,24 +312,26 @@ let SalesService = class SalesService {
             link: '/payments',
             actorId: userId,
         });
-        await this.notifications.notifyByModule({
-            module: 'inventory',
-            type: 'STOCK_DEDUCTED',
-            title: 'Stock Deducted for Sale',
-            message: `Stock reduced for invoice ${invoice.invoiceNo}`,
-            refId: invoice.id,
-            link: '/inventory',
-            actorId: userId,
-        });
-        await this.notifications.notifyByModule({
-            module: 'delivery',
-            type: 'READY_FOR_DISPATCH',
-            title: 'Invoice Ready for Dispatch',
-            message: `Invoice ${invoice.invoiceNo} confirmed for ${invoice.order.customer.name} — create delivery challan`,
-            refId: invoice.id,
-            link: '/delivery',
-            actorId: userId,
-        });
+        if (!options?.fulfilled)
+            await this.notifications.notifyByModule({
+                module: 'inventory',
+                type: 'STOCK_DEDUCTED',
+                title: 'Stock Deducted for Sale',
+                message: `Stock reduced for invoice ${invoice.invoiceNo}`,
+                refId: invoice.id,
+                link: '/inventory',
+                actorId: userId,
+            });
+        if (!options?.fulfilled)
+            await this.notifications.notifyByModule({
+                module: 'delivery',
+                type: 'READY_FOR_DISPATCH',
+                title: 'Invoice Ready for Dispatch',
+                message: `Invoice ${invoice.invoiceNo} confirmed for ${invoice.order.customer.name} — create delivery challan`,
+                refId: invoice.id,
+                link: '/delivery',
+                actorId: userId,
+            });
         await this.customerNotifications.notifyCustomer(invoice.order.customerId, {
             type: 'ORDER_CONFIRMED',
             title: 'Order Confirmed',

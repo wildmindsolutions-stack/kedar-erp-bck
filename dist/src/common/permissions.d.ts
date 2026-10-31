@@ -19,8 +19,12 @@ export declare const PERMISSIONS: {
 };
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 export declare const MODULE_PERMISSIONS: Record<string, Permission[]>;
+export declare const DELIVERY_SUPERVISOR = "Delivery Supervisor";
+export declare const DELIVERY_EXECUTIVE = "Delivery Executive";
 export declare const ROLE_PERMISSIONS: Record<string, Permission[] | ['*']>;
 export declare function hasPermission(userPermissions: string[], role: string, required: Permission): boolean;
 export declare function canAccessModule(role: string, permissions: string[], module: string): boolean;
 export declare function getRolePermissions(roleName: string): Permission[];
+export declare function isFieldDeliveryRole(role: string): boolean;
+export declare function canManageDeliveryAreas(role: string): boolean;
 export declare function canConfirmSalesOrders(role: string): boolean;
